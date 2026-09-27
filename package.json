@@ -1,0 +1,181 @@
+{
+  "name": "lib-web-browser",
+  "productName": "LIB Browser",
+  "version": "1.0.0",
+  "description": "LIB Browser — a fast, private, beautiful web browser built on Chromium.",
+  "main": "src/main/index.js",
+  "author": {
+    "name": "LIB Browser",
+    "email": "tolbertinnovation-debug@users.noreply.github.com"
+  },
+  "license": "MIT",
+  "private": true,
+  "homepage": "https://github.com/tolbertinnovation-debug/Lib-Web-browser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tolbertinnovation-debug/Lib-Web-browser.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --lib-dev",
+    "test": "node --test \"tests/unit/**/*.test.js\"",
+    "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/**/*.test.js\"",
+    "build:adblock": "node scripts/build-adblock-engine.js",
+    "build:icons": "electron scripts/render-icons.js",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build:adblock && electron-builder",
+    "dist:win": "npm run build:adblock && electron-builder --win",
+    "dist:mac": "npm run build:adblock && electron-builder --mac",
+    "dist:linux": "npm run build:adblock && electron-builder --linux"
+  },
+  "dependencies": {
+    "@ghostery/adblocker": "^2.18.2",
+    "@ghostery/adblocker-electron": "^2.18.2",
+    "@ghostery/adblocker-electron-preload": "^2.18.2",
+    "@mozilla/readability": "^0.6.0",
+    "tldts": "^7.4.16"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "playwright-core": "^1.63.0"
+  },
+  "build": {
+    "appId": "com.lib.browser",
+    "productName": "LIB Browser",
+    "executableName": "lib-browser",
+    "copyright": "Copyright © 2026 LIB Browser",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "!**/*.map",
+      "!**/*.d.ts",
+      "!**/*.md"
+    ],
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asar": true,
+    "protocols": [
+      {
+        "name": "Web URL",
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "role": "Viewer"
+      }
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "html",
+          "htm",
+          "xhtml",
+          "shtml"
+        ],
+        "name": "HTML Document",
+        "role": "Viewer"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "extendInfo": {
+        "NSCameraUsageDescription": "Websites you visit may request access to your camera.",
+        "NSMicrophoneUsageDescription": "Websites you visit may request access to your microphone.",
+        "NSLocationUsageDescription": "Websites you visit may request your location."
+      }
+    },
+    "dmg": {
+      "title": "LIB Browser"
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "LIB Browser",
+      "include": "build/installer.nsh",
+      "artifactName": "LIB-Browser-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "LIB-Browser-Portable-${version}.${ext}"
+    },
+    "linux": {
+      "icon": "build/icons",
+      "category": "Network",
+      "synopsis": "A fast, private, beautiful web browser",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "mimeTypes": [
+        "text/html",
+        "application/xhtml+xml",
+        "x-scheme-handler/http",
+        "x-scheme-handler/https"
+      ],
+      "desktop": {
+        "entry": {
+          "Name": "LIB Browser",
+          "GenericName": "Web Browser",
+          "Categories": "Network;WebBrowser;",
+          "StartupWMClass": "LIB Browser",
+          "Keywords": "web;browser;internet;"
+        }
+      }
+    },
+    "deb": {
+      "maintainer": "LIB Browser <tolbertinnovation-debug@users.noreply.github.com>"
+    },
+    "appImage": {
+      "artifactName": "LIB-Browser-${version}-${arch}.${ext}"
+    }
+  }
+}

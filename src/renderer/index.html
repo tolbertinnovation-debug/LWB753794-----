@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http: lib: file:; connect-src 'none'; object-src 'none'; base-uri 'none'" />
+    <meta name="color-scheme" content="light dark" />
+    <title>LIB Browser</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header id="tabbar" class="drag">
+        <div class="traffic-space"></div>
+        <div id="private-badge" hidden></div>
+        <div id="tabstrip-scroll">
+          <div id="tabstrip" role="tablist" aria-label="Tabs"></div>
+          <button id="new-tab" class="icon-btn no-drag" title="New tab (Ctrl+T)" aria-label="New tab"></button>
+        </div>
+        <div class="drag-fill"></div>
+        <div class="wco-space"></div>
+      </header>
+
+      <div id="toolbar">
+        <div class="traffic-space v-only"></div>
+        <div class="nav-group">
+          <button id="btn-sidebar" class="icon-btn v-only" title="Collapse sidebar" aria-label="Toggle sidebar"></button>
+          <button id="btn-back" class="icon-btn" title="Back (Alt+Left) — right-click for history" aria-label="Back"></button>
+          <button id="btn-forward" class="icon-btn" title="Forward (Alt+Right)" aria-label="Forward"></button>
+          <button id="btn-reload" class="icon-btn" title="Reload (Ctrl+R)" aria-label="Reload"></button>
+          <button id="btn-home" class="icon-btn" title="Home" aria-label="Home" hidden></button>
+        </div>
+
+        <div id="omnibox" class="no-drag">
+          <button id="site-chip" title="View site information" aria-label="Site information"></button>
+          <div id="omnibox-field">
+            <input id="url-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Address and search bar" aria-autocomplete="both" aria-controls="omnibox-dropdown" />
+            <div id="url-display" aria-hidden="true"></div>
+          </div>
+          <div id="omnibox-actions">
+            <button id="btn-zoom" class="pill-btn" title="Reset zoom" hidden></button>
+            <button id="btn-reader" class="icon-btn small" title="Reader mode (Ctrl+Alt+R)" aria-label="Reader mode" hidden></button>
+            <button id="btn-shield" class="shield-btn" title="Ads & trackers blocked" aria-label="Tracker blocking"></button>
+            <button id="btn-star" class="icon-btn small" title="Bookmark this tab (Ctrl+D)" aria-label="Bookmark this tab"></button>
+          </div>
+          <div id="load-progress"></div>
+        </div>
+
+        <div class="tool-group">
+          <button id="btn-split" class="icon-btn" title="Split view" aria-label="Split view" hidden></button>
+          <button id="btn-downloads" class="icon-btn" title="Downloads" aria-label="Downloads" hidden></button>
+          <button id="btn-palette" class="icon-btn" title="Search tabs & commands (Ctrl+Shift+A)" aria-label="Search tabs and commands"></button>
+          <button id="btn-menu" class="icon-btn" title="Customize and control LIB" aria-label="Menu"></button>
+        </div>
+        <div class="wco-space v-only"></div>
+        <div id="toast-host" aria-live="polite"></div>
+      </div>
+
+      <nav id="bookmarks-bar" aria-label="Bookmarks bar"></nav>
+      <div id="infobars"></div>
+      <div id="findbar" hidden></div>
+
+      <div id="main">
+        <aside id="sidebar" aria-label="Vertical tabs"></aside>
+        <div id="content"></div>
+      </div>
+    </div>
+    <div id="popup-layer"></div>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
