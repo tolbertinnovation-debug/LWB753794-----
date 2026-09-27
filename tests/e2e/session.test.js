@@ -167,6 +167,35 @@ describe('Sessions, shortcuts and permissions', { timeout: 240000 }, () => {
     await app.close();
   });
 
+  it('reorders tabs by dragging and tears them off into a new window', async () => {
+    const ctx = await launch();
+    const { app, chrome } = ctx;
+    await main(app, (lib) => {
+      const w = lib.windows.getFocusedWindow();
+      w.createTab({ url: 'lib://about/' });
+      w.createTab({ url: 'lib://shortcuts/' });
+    });
+    await chrome.waitForFunction(() => document.querySelectorAll('#tabstrip .tab').length === 3);
+    const ids = await main(app, (lib) => lib.windows.getFocusedWindow().tabs.map((t) => t.id));
+    const drag = async (id, dx, dy) => {
+      const box = await chrome.locator(`.tab[data-id="${id}"]`).boundingBox();
+      const x = box.x + 40;
+      const y = box.y + 15;
+      await chrome.mouse.move(x, y);
+      await chrome.mouse.down();
+      for (let i = 1; i <= 12; i++) {
+        await chrome.mouse.move(x + (dx * i) / 12, y + (dy * i) / 12);
+        await sleep(16);
+      }
+      await chrome.mouse.up();
+    };
+    await drag(ids[0], 300, 0);
+    await waitFor(async () => (await main(app, (lib) => lib.windows.getFocusedWindow().tabs.map((t) => t.id))).join() === [ids[1], ids[0], ids[2]].join(), 5000, 'reordered');
+    await drag(ids[2], 0, 120);
+    await waitFor(() => main(app, (lib) => lib.windows.all().length === 2), 5000, 'torn off');
+    await app.close();
+  });
+
   it('HTTPS-Only mode upgrades and offers an HTTP fallback', async () => {
     const ctx = await launch();
     const { app } = ctx;

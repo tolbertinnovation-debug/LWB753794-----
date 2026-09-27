@@ -186,39 +186,48 @@ class TabList {
     let targetIndex = -1;
     let detach = false;
 
+    // Measure resting positions once: siblings animate while shifting, so
+    // live measurements would make the drop target flip-flop.
+    let centers = [];
+    let startCenter = 0;
+    const measure = () => {
+      const list = siblings();
+      centers = list.map((s) => {
+        const r = s.getBoundingClientRect();
+        return this.vertical ? r.top + r.height / 2 : r.left + r.width / 2;
+      });
+      startCenter = centers[list.indexOf(el)];
+    };
+
     const move = (ev) => {
       const delta = ev[axis] - start;
-      if (!dragging && Math.abs(delta) < 6) return;
+      const crossDelta = (this.vertical ? ev.clientX : ev.clientY) - startCross;
+      if (!dragging && Math.abs(delta) < 6 && Math.abs(crossDelta) < 6) return;
       if (!dragging) {
         dragging = true;
+        measure();
         el.classList.add('dragging');
         el.setPointerCapture(ev.pointerId);
         for (const s of siblings()) if (s !== el) s.classList.add('shifting');
       }
       const list = siblings();
       const myIndex = list.indexOf(el);
-      const rect0 = el.getBoundingClientRect();
-      const offset = delta;
-      el.style.transform = this.vertical ? `translateY(${offset}px)` : `translateX(${offset}px)`;
+      el.style.transform = this.vertical ? `translateY(${delta}px)` : `translateX(${delta}px)`;
       // Tear-off: dragging far away from the strip moves the tab to a new window.
-      const cross = (this.vertical ? ev.clientX : ev.clientY) - startCross;
-      detach = !this.vertical && Math.abs(cross) > 70;
+      detach = !this.vertical && Math.abs(crossDelta) > 70;
       el.style.opacity = detach ? '0.6' : '';
-      const center = (this.vertical ? rect0.top + rect0.height / 2 : rect0.left + rect0.width / 2);
+      const center = startCenter + delta;
       targetIndex = myIndex;
       list.forEach((s, i) => {
         if (s === el) return;
-        const r = s.getBoundingClientRect();
-        const sCenter = this.vertical ? r.top + r.height / 2 - (parseFloat(s.dataset.shift) || 0) : r.left + r.width / 2 - (parseFloat(s.dataset.shift) || 0);
         let shift = 0;
-        if (i > myIndex && center > sCenter) {
+        if (i > myIndex && center > centers[i]) {
           shift = -size();
           targetIndex = Math.max(targetIndex, i);
-        } else if (i < myIndex && center < sCenter) {
+        } else if (i < myIndex && center < centers[i]) {
           shift = size();
           targetIndex = Math.min(targetIndex, i);
         }
-        s.dataset.shift = String(shift);
         s.style.transform = shift ? (this.vertical ? `translateY(${shift}px)` : `translateX(${shift}px)`) : '';
       });
     };
@@ -232,7 +241,6 @@ class TabList {
       for (const s of list) {
         s.classList.remove('shifting');
         s.style.transform = '';
-        delete s.dataset.shift;
       }
       el.classList.remove('dragging');
       el.style.transform = '';
