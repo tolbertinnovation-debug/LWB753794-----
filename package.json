@@ -115,6 +115,7 @@
       },
       "identity": "-",
       "hardenedRuntime": false,
+      "executableName": "LIB Browser",
       "artifactName": "LIB-Browser-${version}-mac-${arch}.${ext}"
     },
     "dmg": {
@@ -147,6 +148,7 @@
       "createStartMenuShortcut": true,
       "shortcutName": "LIB Browser",
       "include": "build/installer.nsh",
+      "buildUniversalInstaller": false,
       "artifactName": "LIB-Browser-Setup-${version}-${arch}.${ext}"
     },
     "portable": {

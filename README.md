@@ -15,18 +15,19 @@ A modern desktop web browser for Windows, macOS and Linux — built on Chromium,
 
 ## Download & install
 
-Installers are built automatically by GitHub Actions for every platform:
+**[Download the latest release](https://github.com/tolbertinnovation-debug/Lib-Web-browser/releases/latest)** and pick the file for your computer:
 
 | Platform | File | Notes |
 | --- | --- | --- |
-| **Windows** 10/11 | `LIB-Browser-Setup-<version>-x64.exe` (or `-arm64`) | Standard installer. A portable `.exe` is also provided. |
-| **macOS** 11+ | `LIB-Browser-<version>-arm64.dmg` (Apple Silicon) or `-x64.dmg` (Intel) | The app isn't notarized yet: the first time, right-click the app → **Open**. |
-| **Linux** | `LIB-Browser-<version>-x86_64.AppImage` or `.deb` | AppImage: `chmod +x` then run. Debian/Ubuntu: `sudo apt install ./LIB-Browser-*.deb` |
+| **Windows** 10/11 | `LIB-Browser-Setup-<version>-x64.exe` (or `-arm64` for Windows on ARM) | Standard installer. `LIB-Browser-Portable-<version>.exe` runs without installing. |
+| **macOS** 12+ | `LIB-Browser-<version>-arm64.dmg` (Apple silicon) or `-x64.dmg` (Intel) | Drag the app into Applications. |
+| **Linux** | `LIB-Browser-<version>-x86_64.AppImage` or `-amd64.deb` | AppImage: `chmod +x` then run. Debian/Ubuntu: `sudo apt install ./LIB-Browser-*.deb` |
 
-**Where to get them**
+The installers aren't signed with a paid certificate yet, so the first launch needs a confirmation:
+- **Windows:** on "Windows protected your PC", click **More info**, then **Run anyway**.
+- **macOS:** if the app is blocked, open **System Settings → Privacy & Security** and click **Open Anyway**. If macOS says the app "is damaged", run `xattr -cr "/Applications/LIB Browser.app"` in Terminal.
 
-- **Releases** — push a version tag (for example `v1.0.0`) and the *Build installers* workflow publishes a GitHub Release with all installers attached.
-- **Any time** — open the repository's **Actions** tab → **Build installers** → **Run workflow**. When it finishes, download the installers from the run's **Artifacts** section.
+**Publishing installers.** Push a version tag (for example `v1.0.0`) and the *Build installers* workflow publishes a GitHub Release with every installer attached. The release text comes from `docs/release-notes/<tag>.md`. You can also run the workflow any time from the **Actions** tab (**Build installers** → **Run workflow**) and download the installers from the run's **Artifacts** section.
 
 After installing, open **Settings → General → Make default** to use LIB for links from other apps.
 
