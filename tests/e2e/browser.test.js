@@ -198,11 +198,22 @@ describe('LIB Browser', { timeout: 240000 }, () => {
 
   it('asks for HTTP credentials', async () => {
     await navigate(`${srv.base}/auth`);
-    await chrome.waitForSelector('form.dialog input[type=password]');
-    await chrome.fill('form.dialog input[type=text]', 'lib');
-    await chrome.fill('form.dialog input[type=password]', 'secret');
-    await chrome.keyboard.press('Enter');
-    await waitActive((t) => t.title === 'Authorized', 'authorized');
+    const dialog = chrome.locator('form.dialog').last();
+    await dialog.locator('input[type=password]').waitFor();
+    await dialog.locator('input[type=text]').fill('lib');
+    await dialog.locator('input[type=password]').fill('secret');
+    await dialog.locator('input[type=password]').press('Enter');
+    await waitActive((t) => t.title === 'Authorized', 'authorized').catch(async (err) => {
+      throw new Error(`${err.message} (${await chrome.locator('form.dialog').count()} sign-in dialog(s) open)`);
+    });
+    assert.equal(await chrome.locator('.popup-backdrop.modal').count(), 0, 'no sign-in dialog left open');
+    // Leaving the page dismisses a pending sign-in prompt.
+    await main(app, (lib) => lib.windows.getFocusedWindow().session.clearAuthCache());
+    await navigate(`${srv.base}/auth?again`);
+    await chrome.locator('form.dialog input[type=password]').waitFor();
+    await navigate(`${srv.base}/page2.html`);
+    await waitActive((t) => t.title === 'Second Page', 'navigated away');
+    await waitFor(async () => (await chrome.locator('.popup-backdrop.modal').count()) === 0, 5000, 'sign-in prompt dismissed');
   });
 
   it('shows a friendly error page and keeps the failed URL', async () => {

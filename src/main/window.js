@@ -520,13 +520,7 @@ class BrowserWindowController {
     if (index < 0) return;
     if (!keepAlive && !this.isPrivate) ctx.sessionState?.pushClosedTab(snapshot || tab.serialize(), index, this.id);
     this.tabs.splice(index, 1);
-    for (const [id, req] of this.authRequests) {
-      if (req.tab === tab) {
-        this.authRequests.delete(id);
-        req.callback();
-        this.sendChrome('auth-cancel', { id });
-      }
-    }
+    this.cancelAuthForTab(tab);
     if (this.split && this.split.tabIds.includes(tab.id)) this.split = null;
     if (this.htmlFullscreenTab === tab) this.setHtmlFullscreen(tab, false);
     if (keepAlive) {
@@ -735,6 +729,17 @@ class BrowserWindowController {
       isProxy: authInfo.isProxy,
       scheme: authInfo.scheme,
     });
+  }
+
+  /** Dismiss a tab's sign-in prompts (it closed or moved on to another page). */
+  cancelAuthForTab(tab) {
+    for (const [id, req] of this.authRequests) {
+      if (req.tab === tab) {
+        this.authRequests.delete(id);
+        req.callback();
+        this.sendChrome('auth-cancel', { id });
+      }
+    }
   }
 
   respondAuth(id, credentials) {

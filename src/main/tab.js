@@ -174,8 +174,9 @@ class Tab extends EventEmitter {
     wc.on('did-start-navigation', (details) => {
       if (!details.isMainFrame || details.isSameDocument) return;
       // Clearing per-page state happens at commit (did-navigate); here we only
-      // need to drop pending permission prompts for the old page.
+      // need to drop pending permission and sign-in prompts for the old page.
       ctx.permissions.cancelForTab(this);
+      this.win.cancelAuthForTab(this);
       this._pendingBlocked = 0;
     });
     wc.on('did-navigate', (_e, url) => {
