@@ -27,7 +27,9 @@ The installers aren't signed with a paid certificate yet, so the first launch ne
 - **Windows:** on "Windows protected your PC", click **More info**, then **Run anyway**.
 - **macOS:** if the app is blocked, open **System Settings → Privacy & Security** and click **Open Anyway**. If macOS says the app "is damaged", run `xattr -cr "/Applications/LIB Browser.app"` in Terminal.
 
-**Publishing installers.** Push a version tag (for example `v1.0.0`) and the *Build installers* workflow publishes a GitHub Release with every installer attached. The release text comes from `docs/release-notes/<tag>.md`. You can also run the workflow any time from the **Actions** tab (**Build installers** → **Run workflow**) and download the installers from the run's **Artifacts** section.
+**Publishing installers.** The *Build installers* workflow publishes a GitHub Release with every installer attached. The release text comes from `docs/release-notes/<tag>.md`. There are two ways to run it:
+- Push a version tag, for example `v1.0.0`.
+- Open **Actions** → **Build installers** → **Run workflow** and enter a release tag. Leave the tag empty to only build the installers, then download them from the run's **Artifacts** section.
 
 After installing, open **Settings → General → Make default** to use LIB for links from other apps.
 
