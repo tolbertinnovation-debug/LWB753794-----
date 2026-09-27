@@ -217,6 +217,32 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     assert.match(heading, /restricted|reached|working/i);
   });
 
+  it('"Try again" on an error page reloads the failed address in place', async () => {
+    const http = require('node:http');
+    const probe = http.createServer();
+    await new Promise((r) => probe.listen(0, '127.0.0.1', r));
+    const { port } = probe.address();
+    await new Promise((r) => probe.close(r));
+    await navigate(`http://127.0.0.1:${port}/`);
+    await waitActive((t) => t.errorCode === -102, 'connection refused');
+    const late = http.createServer((req, res) => {
+      res.writeHead(200, { 'content-type': 'text/html' });
+      res.end('<title>Back Online</title>ok');
+    });
+    await new Promise((r) => late.listen(port, '127.0.0.1', r));
+    try {
+      await waitFor(
+        () => main(app, (lib) => lib.windows.getFocusedWindow().activeTab.webContents.executeJavaScript("!!document.querySelector('a.btn.primary')")),
+        5000,
+        'error page button',
+      );
+      await main(app, (lib) => lib.windows.getFocusedWindow().activeTab.webContents.executeJavaScript("document.querySelector('a.btn.primary').click()", true));
+      await waitActive((t) => t.title === 'Back Online', 'reloaded');
+    } finally {
+      late.close();
+    }
+  });
+
   it('opens articles in reader mode', async () => {
     await navigate(`${srv.base}/article.html`);
     await waitActive((t) => t.readerable, 'readerable');
