@@ -1,0 +1,81 @@
+name: Build installers
+
+# Builds Windows, macOS and Linux installers.
+# - Push a tag like "v1.0.0" to publish them as a GitHub Release.
+# - Or run it manually (Actions › Build installers › Run workflow) and download
+#   the installers from the run's "Artifacts" section.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            args: --win
+          - name: macOS
+            os: macos-latest
+            args: --mac
+          - name: Linux
+            os: ubuntu-latest
+            args: --linux
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Bundle ad & tracker filter lists
+        run: npm run build:adblock
+
+      - name: Build installers
+        run: npx electron-builder ${{ matrix.args }} --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LIB-Browser-${{ matrix.name }}
+          if-no-files-found: error
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.zip
+            dist/*.AppImage
+            dist/*.deb
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: LIB Browser ${{ github.ref_name }}
+          files: artifacts/*
+          generate_release_notes: true

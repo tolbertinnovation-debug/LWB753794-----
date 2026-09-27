@@ -3,6 +3,7 @@
   "productName": "LIB Browser",
   "version": "1.0.0",
   "description": "LIB Browser — a fast, private, beautiful web browser built on Chromium.",
+  "desktopName": "lib-browser.desktop",
   "main": "src/main/index.js",
   "author": {
     "name": "LIB Browser",
@@ -111,10 +112,14 @@
         "NSCameraUsageDescription": "Websites you visit may request access to your camera.",
         "NSMicrophoneUsageDescription": "Websites you visit may request access to your microphone.",
         "NSLocationUsageDescription": "Websites you visit may request your location."
-      }
+      },
+      "identity": "-",
+      "hardenedRuntime": false,
+      "artifactName": "LIB-Browser-${version}-mac-${arch}.${ext}"
     },
     "dmg": {
-      "title": "LIB Browser"
+      "title": "LIB Browser",
+      "artifactName": "LIB-Browser-${version}-${arch}.${ext}"
     },
     "win": {
       "icon": "build/icon.png",
@@ -166,16 +171,18 @@
           "Name": "LIB Browser",
           "GenericName": "Web Browser",
           "Categories": "Network;WebBrowser;",
-          "StartupWMClass": "LIB Browser",
           "Keywords": "web;browser;internet;"
         }
-      }
+      },
+      "syncDesktopName": true
     },
     "deb": {
-      "maintainer": "LIB Browser <tolbertinnovation-debug@users.noreply.github.com>"
+      "maintainer": "LIB Browser <tolbertinnovation-debug@users.noreply.github.com>",
+      "artifactName": "LIB-Browser-${version}-${arch}.${ext}"
     },
     "appImage": {
       "artifactName": "LIB-Browser-${version}-${arch}.${ext}"
-    }
+    },
+    "publish": null
   }
 }

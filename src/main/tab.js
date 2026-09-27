@@ -629,7 +629,7 @@ class Tab extends EventEmitter {
     }
     this.state.devtools = true;
     this._emitUpdate();
-    this.win.layout();
+    this.win._syncViews(); // attach the DevTools view next to the page
   }
 
   closeDevTools() {
@@ -643,7 +643,7 @@ class Tab extends EventEmitter {
     if (this.state.devtools) {
       this.state.devtools = false;
       this._emitUpdate();
-      this.win.layout();
+      if (!this.win.closed) this.win._syncViews();
     }
   }
 

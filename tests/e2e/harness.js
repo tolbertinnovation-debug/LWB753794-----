@@ -73,7 +73,8 @@ async function launch(opts = {}) {
   const userData = opts.userData || fs.mkdtempSync(path.join(os.tmpdir(), 'lib-e2e-'));
   const downloads = path.join(userData, 'Downloads');
   fs.mkdirSync(downloads, { recursive: true });
-  const args = [...(process.getuid && process.getuid() === 0 ? ['--no-sandbox'] : []), ROOT, ...(opts.args || [])];
+  // Test-only: CI runners (and root) can't use Chromium's sandbox.
+  const args = [...(process.platform === 'linux' ? ['--no-sandbox'] : []), ROOT, ...(opts.args || [])];
   const app = await electron.launch({
     executablePath: electronPath(),
     args,

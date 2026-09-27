@@ -163,7 +163,6 @@ function tile({ url, title, favicon, pinned, onRemove }) {
   const a = h('a.tile', { href: url, title: `${title}\n${url}`, draggable: 'false' });
   const ic = h('span.tile-icon', {}, faviconEl(favicon || faviconGuess(url), url, 28));
   a.append(ic, h('span.tile-title', {}, title));
-  if (pinned) a.append(h('span.pin', { html: icon('pin', 12) }));
   const rm = h('button.tile-remove', { title: pinned ? 'Remove shortcut' : "Don't show on this page", 'aria-label': 'Remove', html: icon('x', 12) });
   rm.addEventListener('click', (e) => {
     e.preventDefault();

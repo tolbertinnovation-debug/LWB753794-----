@@ -9,7 +9,7 @@ const { getBrowsingSession, resetPrivateSession } = require('./sessions');
 const RENDERER_HTML = path.join(__dirname, '..', 'renderer', 'index.html');
 const STATUS_HTML = path.join(__dirname, '..', 'renderer', 'status.html');
 const CHROME_PRELOAD = path.join(__dirname, '..', 'preload', 'chrome-preload.js');
-const ICON = path.join(__dirname, '..', '..', 'build', 'icon.png');
+const ICON = path.join(__dirname, '..', 'renderer', 'icon.png');
 
 const SPLIT_GAP = 6;
 const IS_MAC = process.platform === 'darwin';
@@ -253,7 +253,7 @@ class BrowserWindowController {
 
   /** Attach/detach views so exactly the visible tabs are in the window. */
   _syncViews() {
-    if (this.closed) return;
+    if (this.closed || this.win.isDestroyed()) return;
     const want = new Set();
     for (const tab of this.visibleTabs()) {
       tab.ensureView();
@@ -282,6 +282,12 @@ class BrowserWindowController {
   }
 
   detachView(view) {
+    // Once the native window is gone its views are torn down with it; touching
+    // them again is unsafe.
+    if (this.closed || this.win.isDestroyed()) {
+      this.attached.delete(view);
+      return;
+    }
     if (this.attached.has(view)) {
       try {
         this.win.contentView.removeChildView(view);
@@ -293,7 +299,7 @@ class BrowserWindowController {
   }
 
   _restack() {
-    if (this.closed) return;
+    if (this.closed || this.win.isDestroyed()) return;
     const cv = this.win.contentView;
     if (!this.raised) cv.addChildView(this.chromeView, 0);
     if (this.statusView && this.statusVisible && !this.htmlFullscreenTab) cv.addChildView(this.statusView);

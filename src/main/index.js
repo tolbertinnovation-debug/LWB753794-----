@@ -164,7 +164,7 @@ app.whenReady().then(async () => {
   // Periodically persist the session for crash recovery.
   setInterval(() => ctx.sessionState.scheduleSave(), 30 * 1000).unref?.();
 
-  if (ctx.isTest) globalThis.__lib = { ctx, windows: require('./windows'), commands: require('./commands') };
+  if (ctx.isTest) globalThis.__lib = { ctx, windows: require('./windows'), commands: require('./commands'), require };
 });
 
 app.on('activate', () => {

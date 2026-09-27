@@ -308,6 +308,53 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     await waitActive((t) => t.zoom === 1, 'reset');
   });
 
+  it('docks DevTools next to the page and closes them again', async () => {
+    await navigate(`${srv.base}/page2.html`);
+    await waitActive((t) => t.title === 'Second Page' && !t.loading, 'page');
+    await main(app, (lib) => lib.commands.run('devtools'));
+    const info = await waitFor(
+      () => main(app, (lib) => {
+        const w = lib.windows.getFocusedWindow();
+        const t = w.activeTab;
+        return t.devtoolsView && w.attached.has(t.devtoolsView) && w._layoutInfo.devtools ? { pageWidth: w._layoutInfo.panes[0].width } : null;
+      }),
+      8000,
+      'docked devtools',
+    );
+    assert.ok(info.pageWidth < 1200);
+    await main(app, (lib) => lib.commands.run('devtools'));
+    await waitFor(() => main(app, (lib) => !lib.windows.getFocusedWindow().activeTab.devtoolsView), 5000, 'devtools closed');
+  });
+
+  it('saves screenshots to the downloads folder', async () => {
+    await main(app, (lib) => lib.commands.run('screenshot'));
+    await waitFor(() => fs.readdirSync(ctx.downloads).some((f) => f.startsWith('LIB Screenshot') && f.endsWith('.png')), 8000, 'screenshot file');
+  });
+
+  it('recovers crashed tabs', async () => {
+    await main(app, (lib) => lib.windows.getFocusedWindow().activeTab.webContents.forcefullyCrashRenderer());
+    await waitActive((t) => t.crashed, 'crashed');
+    await waitFor(() => chrome.evaluate(() => !!document.querySelector('.sad-tab')), 5000, 'sad tab UI');
+    await chrome.click('.sad-tab .btn');
+    await waitActive((t) => !t.crashed && t.title === 'Second Page', 'reloaded');
+  });
+
+  it('moves a tab into its own window', async () => {
+    await main(app, (lib, u) => lib.windows.getFocusedWindow().createTab({ url: u }), `${srv.base}/index.html`);
+    await waitActive((t) => t.title === 'Fixture Home', 'new tab');
+    const before = await main(app, (lib) => lib.windows.all().length);
+    await main(app, (lib) => lib.commands.run('moveToNewWindow'));
+    await waitFor(() => main(app, (lib, n) => lib.windows.all().length === n + 1, before), 5000, 'new window');
+    const moved = await main(app, (lib) => {
+      const w = lib.windows.all()[lib.windows.all().length - 1];
+      return { tabs: w.tabs.length, title: w.activeTab.state.title };
+    });
+    assert.deepEqual(moved, { tabs: 1, title: 'Fixture Home' });
+    if (process.env.LIB_E2E_DEBUG) console.log('windows before close', JSON.stringify(await main(app, (lib) => lib.windows.all().map((w) => ({ id: w.id, p: w.isPrivate, tabs: w.tabs.map((t) => t.state.url) })))));
+    await main(app, (lib) => lib.windows.all()[lib.windows.all().length - 1].close());
+    if (process.env.LIB_E2E_DEBUG) console.log('windows after close', JSON.stringify(await main(app, (lib) => lib.windows.all().map((w) => w.id))));
+  });
+
   it('internal pages render (settings, history, bookmarks, downloads, about, shortcuts, tasks)', async () => {
     for (const page of ['settings', 'history', 'bookmarks', 'downloads', 'about', 'shortcuts', 'tasks']) {
       await navigate(`lib://${page}/`);
