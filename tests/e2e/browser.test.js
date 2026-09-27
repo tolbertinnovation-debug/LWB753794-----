@@ -376,9 +376,17 @@ describe('LIB Browser', { timeout: 240000 }, () => {
       return { tabs: w.tabs.length, title: w.activeTab.state.title };
     });
     assert.deepEqual(moved, { tabs: 1, title: 'Fixture Home' });
-    if (process.env.LIB_E2E_DEBUG) console.log('windows before close', JSON.stringify(await main(app, (lib) => lib.windows.all().map((w) => ({ id: w.id, p: w.isPrivate, tabs: w.tabs.map((t) => t.state.url) })))));
     await main(app, (lib) => lib.windows.all()[lib.windows.all().length - 1].close());
-    if (process.env.LIB_E2E_DEBUG) console.log('windows after close', JSON.stringify(await main(app, (lib) => lib.windows.all().map((w) => w.id))));
+    await waitFor(() => main(app, (lib, n) => lib.windows.all().length === n, before), 5000, 'moved window closed');
+  });
+
+  it('survives windows that close right after opening', async () => {
+    const before = await main(app, (lib) => lib.windows.all().length);
+    for (let i = 0; i < 12; i++) {
+      await main(app, (lib) => lib.windows.createWindow({ url: 'lib://about/' }));
+      await main(app, (lib) => lib.windows.all()[lib.windows.all().length - 1].close());
+    }
+    await waitFor(() => main(app, (lib, n) => lib.windows.all().length === n, before), 10000, 'windows closed');
   });
 
   it('internal pages render (settings, history, bookmarks, downloads, about, shortcuts, tasks)', async () => {

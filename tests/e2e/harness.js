@@ -122,7 +122,18 @@ function main(app, fn, arg) {
   return app.evaluate(({ app: _a }, [src, a]) => {
     // eslint-disable-next-line no-new-func
     const f = new Function('lib', 'arg', `return (${src})(lib, arg);`);
-    return f(globalThis.__lib, a);
+    // The inspector can run this in the middle of other main-process JS (even
+    // inside an Electron event handler, where e.g. loadURL is refused), so run
+    // the test code on a clean stack, like a real IPC message or timer would.
+    return new Promise((resolve, reject) => {
+      setImmediate(() => {
+        try {
+          resolve(f(globalThis.__lib, a));
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
   }, [fn.toString(), arg]);
 }
 

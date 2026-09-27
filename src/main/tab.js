@@ -57,6 +57,10 @@ class Tab extends EventEmitter {
     this._typed = false;
     this._fallbackUrl = null;
     this._closing = false;
+    // Blocked requests seen while a main-frame navigation is in flight; they
+    // belong to the incoming page, whose early sub-resources can be blocked
+    // before its commit (did-navigate) reaches us.
+    this._pendingBlocked = null;
     this.state = {
       url: opts.url || NEWTAB_URL,
       title: opts.title || '',
@@ -159,6 +163,11 @@ class Tab extends EventEmitter {
     });
     wc.on('did-stop-loading', () => {
       this.state.loading = false;
+      if (this._pendingBlocked !== null) {
+        // The navigation never committed: the count stays with this page.
+        this.state.blocked += this._pendingBlocked;
+        this._pendingBlocked = null;
+      }
       this._syncNavState();
       this._emitUpdate();
     });
@@ -167,13 +176,15 @@ class Tab extends EventEmitter {
       // Clearing per-page state happens at commit (did-navigate); here we only
       // need to drop pending permission prompts for the old page.
       ctx.permissions.cancelForTab(this);
+      this._pendingBlocked = 0;
     });
     wc.on('did-navigate', (_e, url) => {
       // Error pages never emit did-navigate, so reaching here means success.
       this.errorInfo = null;
       this.state.url = url;
       this.state.errorCode = 0;
-      this.state.blocked = 0;
+      this.state.blocked = this._pendingBlocked ?? 0;
+      this._pendingBlocked = null;
       this.state.readerable = false;
       this.state.crashed = false;
       this.state.certOverride = [...certExceptions].some((e) => e.startsWith(`${hostOf(url)}|`)) && url.startsWith('https:');
@@ -423,6 +434,8 @@ class Tab extends EventEmitter {
     this.errorInfo = { code, description, url, httpsOnlyFallback };
     this.state.errorCode = code;
     this.state.url = url;
+    this.state.blocked = 0;
+    this._pendingBlocked = null;
     this.state.title = hostOf(url) || url;
     this.state.loading = false;
     this._syncNavState();
@@ -451,7 +464,8 @@ class Tab extends EventEmitter {
 
   /** Called by the network layer when a sub-resource was blocked. */
   onRequestBlocked() {
-    this.state.blocked += 1;
+    if (this._pendingBlocked !== null) this._pendingBlocked += 1;
+    else this.state.blocked += 1;
     this._emitUpdate();
   }
 
