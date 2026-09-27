@@ -70,6 +70,18 @@ test('History records, ranks, completes and clears', () => {
   assert.equal(h.query().length, 0);
 });
 
+test('History fills in titles for repeat visits', () => {
+  const h = new History(path.join(tmpdir(), 'history.json'));
+  h.addVisit({ url: 'https://a.com/', title: '' });
+  h.updatePage('https://a.com/', { title: 'A' });
+  h.addVisit({ url: 'https://b.com/', title: 'B' });
+  h.addVisit({ url: 'https://a.com/', title: '' });
+  assert.equal(h.query()[0].title, 'A', 'known title reused');
+  h.updatePage('https://a.com/', { title: 'A!' });
+  assert.equal(h.query()[0].title, 'A!');
+  assert.equal(h.query()[2].title, 'A', 'older visit keeps its title');
+});
+
 test('History collapses rapid duplicate visits', () => {
   const h = new History(path.join(tmpdir(), 'history.json'));
   h.addVisit({ url: 'https://a.com/', title: 'A' });

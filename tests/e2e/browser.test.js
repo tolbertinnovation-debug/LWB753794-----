@@ -277,6 +277,13 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     assert.equal(afterCount, before);
     const isolated = await main(app, (lib, id) => lib.windows.get(id).session !== lib.windows.all()[0].session, winId);
     assert.equal(isolated, true);
+    // The private New Tab page renders its explainer.
+    await main(app, (lib, id) => lib.windows.get(id).createTab(), winId);
+    await waitFor(
+      () => main(app, (lib, id) => lib.windows.get(id).activeTab.webContents.executeJavaScript("!document.body.classList.contains('loading') && !document.getElementById('private-info').hidden"), winId),
+      8000,
+      'private new tab page',
+    );
     await main(app, (lib, id) => lib.windows.get(id).close(), winId);
   });
 

@@ -47,11 +47,13 @@ class History extends EventEmitter {
     const d = this.data;
     // Collapse rapid duplicate visits (redirect chains, reloads) into one.
     const last = d.visits[d.visits.length - 1];
+    const known = d.urls[url]?.title || '';
     if (last && last.url === url && now - last.time < 30 * 1000) {
       if (title) last.title = title;
       last.time = now;
     } else {
-      d.visits.push({ id: d.nextId++, url, title, time: now });
+      // The page's <title> usually arrives after the visit; reuse the known one meanwhile.
+      d.visits.push({ id: d.nextId++, url, title: title || known, time: now });
       if (d.visits.length > MAX_VISITS) d.visits.splice(0, d.visits.length - MAX_VISITS);
     }
     const rec = d.urls[url] || { title: '', visits: 0, typed: 0, last: 0, first: now, favicon: '' };
@@ -72,14 +74,20 @@ class History extends EventEmitter {
     const rec = this.data.urls[url];
     if (!rec) return;
     let changed = false;
-    if (title && rec.title !== title) {
-      rec.title = title;
-      changed = true;
+    if (title) {
+      if (rec.title !== title) {
+        rec.title = title;
+        changed = true;
+      }
+      // Also fix up the most recent visit of this URL.
       for (let i = this.data.visits.length - 1, n = 0; i >= 0 && n < 50; i--, n++) {
-        if (this.data.visits[i].url === url) {
-          this.data.visits[i].title = title;
-          break;
+        const v = this.data.visits[i];
+        if (v.url !== url) continue;
+        if (v.title !== title) {
+          v.title = title;
+          changed = true;
         }
+        break;
       }
     }
     if (favicon && rec.favicon !== favicon) {

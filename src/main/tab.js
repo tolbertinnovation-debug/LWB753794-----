@@ -139,7 +139,7 @@ class Tab extends EventEmitter {
     if (saved && Array.isArray(saved.entries) && saved.entries.length) {
       const index = Math.min(Math.max(0, saved.index ?? saved.entries.length - 1), saved.entries.length - 1);
       wc.navigationHistory.restore({ entries: saved.entries, index }).catch(() => {
-        wc.loadURL(saved.entries[index]?.url || this.state.url).catch(() => {});
+        if (!wc.isDestroyed()) wc.loadURL(saved.entries[index]?.url || this.state.url).catch(() => {});
       });
     } else {
       wc.loadURL(this.state.url || NEWTAB_URL).catch(() => {});

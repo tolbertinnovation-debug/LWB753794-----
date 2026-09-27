@@ -1,6 +1,6 @@
 import { h, $, faviconEl, debounce } from '/_shared/dom.js';
 import { icon } from '/_shared/icons.js';
-import { call, lib, initPage, formDialog, toast } from '/_shared/page.js';
+import { call, lib, initPage, formDialog, toast, applyTheme } from '/_shared/page.js';
 
 const BACKGROUNDS = [
   { id: 'aurora', name: 'Aurora', css: 'radial-gradient(1200px 800px at 15% 0%, #1b1446 0%, transparent 60%), linear-gradient(160deg, #0d0f24 0%, #12132b 50%, #0a1a2a 100%)' },
@@ -25,8 +25,10 @@ function greetingText(name) {
 }
 
 function tick() {
+  if (data?.isPrivate) return; // the private page has its own static header
   const now = new Date();
-  $('#clock').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const clock = $('#clock');
+  if (clock) clock.textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   const date = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
   $('#greeting').textContent = settings.ntpShowGreeting ? `${greetingText(settings.ntpName)} · ${date}` : date;
 }
@@ -413,7 +415,10 @@ async function main() {
   document.title = data.isPrivate ? 'New Private Tab' : 'New Tab';
   $('#customize').innerHTML = `${icon('palette', 17)}<span>Customize</span>`;
   $('#customize').addEventListener('click', openDrawer);
-  if (data.isPrivate) renderPrivate();
+  if (data.isPrivate) {
+    applyTheme(true); // private windows are always dark
+    renderPrivate();
+  }
   initSearch();
   applyBackground();
   applyToggles();
@@ -443,4 +448,6 @@ async function main() {
   });
 }
 
-main();
+main()
+  .catch((err) => console.error('New Tab failed to initialize', err))
+  .finally(() => document.body.classList.remove('loading'));
