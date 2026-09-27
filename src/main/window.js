@@ -106,6 +106,7 @@ class BrowserWindowController {
     });
     // The UI never navigates anywhere.
     cwc.on('will-navigate', (e) => e.preventDefault());
+    cwc.on('context-menu', (_e, params) => require('./menus').showUiEditMenu(this, params));
     cwc.setWindowOpenHandler(() => ({ action: 'deny' }));
     if (process.env.LIB_DEVTOOLS === '1') cwc.openDevTools({ mode: 'detach' });
 
@@ -120,6 +121,9 @@ class BrowserWindowController {
     cwc.once('did-finish-load', show);
     setTimeout(show, 1500);
 
+    // The content view reports its final size after every resize (the
+    // window 'resize' event can fire before the new size is applied on X11).
+    this.win.contentView.on('bounds-changed', () => this.layout());
     this.win.on('resize', () => this.layout());
     this.win.on('maximize', () => this._sendWindowState());
     this.win.on('unmaximize', () => this._sendWindowState());

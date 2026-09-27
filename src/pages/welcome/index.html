@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Welcome to LIB Browser</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <style>
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+        background: radial-gradient(900px 600px at 10% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%), radial-gradient(800px 600px at 110% 110%, color-mix(in srgb, #06b6d4 18%, transparent), transparent 60%), var(--bg);
+      }
+      .wizard {
+        width: min(720px, 100%);
+        padding: 40px 44px 30px;
+        border-radius: 26px;
+        animation: pop 0.35s var(--ease);
+      }
+      .step {
+        animation: slide 0.3s var(--ease);
+      }
+      @keyframes slide {
+        from {
+          opacity: 0;
+          transform: translateX(16px);
+        }
+      }
+      .logo {
+        width: 72px;
+        height: 72px;
+        margin-bottom: 22px;
+        filter: drop-shadow(0 14px 30px rgba(99, 102, 241, 0.35));
+      }
+      h1 {
+        font-size: 32px;
+        margin: 0 0 10px;
+      }
+      .lead {
+        font-size: 16px;
+        color: var(--text-2);
+        margin: 0 0 26px;
+      }
+      .choices {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .choice {
+        appearance: none;
+        border: 1.5px solid var(--line-strong);
+        background: var(--card);
+        border-radius: 16px;
+        padding: 16px;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+      }
+      .choice:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+      .choice.on {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+      }
+      .choice .ic {
+        color: var(--accent);
+      }
+      .choice b {
+        font-size: 14.5px;
+      }
+      .choice small {
+        color: var(--text-2);
+      }
+      .preview {
+        height: 64px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+      }
+      .row-line {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 0;
+        border-top: 1px solid var(--line);
+      }
+      .row-line .grow {
+        flex: 1;
+      }
+      .row-line .desc {
+        color: var(--text-2);
+        font-size: 13px;
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        margin-top: 28px;
+        gap: 10px;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+        flex: 1;
+      }
+      .dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 4px;
+        background: var(--line-strong);
+        transition: width 0.2s, background 0.2s;
+      }
+      .dots span.on {
+        width: 24px;
+        background: var(--accent);
+      }
+      .big-btn {
+        height: 42px;
+        padding: 0 22px;
+        font-size: 14.5px;
+        border-radius: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card wizard" id="wizard"></main>
+    <script type="module" src="welcome.js"></script>
+  </body>
+</html>

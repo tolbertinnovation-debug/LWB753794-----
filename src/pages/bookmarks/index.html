@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Bookmarks</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <style>
+      .tree-item {
+        padding-left: calc(12px + var(--depth, 0) * 16px);
+      }
+      .tree-item.drop {
+        box-shadow: inset 0 0 0 2px var(--accent);
+      }
+      .list-row.drag-over-top {
+        box-shadow: inset 0 2px 0 var(--accent);
+      }
+      .list-row.drag-over-bottom {
+        box-shadow: inset 0 -2px 0 var(--accent);
+      }
+      .list-row.folder .title {
+        font-weight: 600;
+      }
+      .list-row a.title {
+        color: var(--text);
+      }
+      .crumbs {
+        color: var(--text-2);
+        font-weight: 600;
+        padding: 14px 16px 6px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      #list .card-body {
+        padding: 6px 8px 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="with-sidebar">
+      <nav class="sidebar" id="tree" aria-label="Folders"></nav>
+      <div class="main">
+        <div class="page">
+          <div class="page-head">
+            <h1 id="title"></h1>
+            <div class="spacer"></div>
+            <label class="search-box"><span id="search-icon"></span><input id="q" type="search" placeholder="Search bookmarks" aria-label="Search bookmarks" /></label>
+          </div>
+          <div class="page-head" style="margin-top: -8px">
+            <button id="add-bm" class="btn"></button>
+            <button id="add-folder" class="btn"></button>
+            <div class="spacer"></div>
+            <button id="import" class="btn ghost"></button>
+            <button id="export" class="btn ghost"></button>
+          </div>
+          <div id="list" class="card"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="bookmarks.js"></script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>New Tab</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <link rel="stylesheet" href="newtab.css" />
+  </head>
+  <body class="loading">
+    <div id="bg" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+    <div id="top-right">
+      <button id="customize" class="glass-btn" title="Customize this page"></button>
+    </div>
+    <main id="hero">
+      <div id="clock" aria-live="off"></div>
+      <div id="greeting"></div>
+      <form id="search" role="search" autocomplete="off">
+        <span id="search-icon"></span>
+        <input id="q" type="text" spellcheck="false" aria-label="Search the web or type a URL" />
+        <kbd id="search-hint">↵</kbd>
+      </form>
+      <div id="suggestions" role="listbox" hidden></div>
+      <section id="tiles" aria-label="Shortcuts"></section>
+      <section id="private-info" hidden></section>
+    </main>
+    <footer id="footer">
+      <div id="stats" hidden></div>
+      <div id="recent" hidden></div>
+    </footer>
+    <aside id="drawer" aria-label="Customize" hidden></aside>
+    <script type="module" src="newtab.js"></script>
+  </body>
+</html>

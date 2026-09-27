@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <div class="with-sidebar">
+      <nav class="sidebar" id="nav" aria-label="Settings sections"></nav>
+      <div class="main">
+        <div class="page">
+          <div class="page-head">
+            <h1 id="title">Settings</h1>
+            <div class="spacer"></div>
+            <label class="search-box"><span id="search-icon"></span><input id="filter" type="search" placeholder="Search settings" aria-label="Search settings" /></label>
+          </div>
+          <div id="sections"></div>
+          <div id="no-results" class="empty" hidden><h2>No matching settings</h2><p>Try a different search.</p></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="settings.js"></script>
+  </body>
+</html>

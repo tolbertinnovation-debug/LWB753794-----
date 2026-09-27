@@ -38,7 +38,15 @@ function chromeSettings() {
 }
 
 function bookmarksBar() {
-  return ctx.bookmarks.barItems().map((n) => ({ id: n.id, type: n.type, title: n.title, url: n.url || '', count: n.children ? n.children.length : 0 }));
+  const urls = ctx.history.data.urls;
+  return ctx.bookmarks.barItems().map((n) => ({
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    url: n.url || '',
+    favicon: n.url ? urls[n.url]?.favicon || urls[`${n.url.replace(/\/$/, '')}/`]?.favicon || '' : '',
+    count: n.children ? n.children.length : 0,
+  }));
 }
 
 function downloadsFor(win) {
@@ -138,6 +146,9 @@ const chromeApi = {
       case 'split':
         if (t !== win.activeTab) win.openSplit(win.activeTab, t);
         break;
+      case 'newWindow':
+        win.moveTabToNewWindow(t);
+        break;
       default:
         break;
     }
@@ -180,11 +191,12 @@ const chromeApi = {
     else if (action === 'stop') t.stop();
     else if (action === 'home') t.navigate(ctx.settings.get('homepage') || 'lib://newtab/');
   },
-  suggest(win, text) {
+  suggest(win, text, allowInline = true) {
     return localSuggestions(String(text || ''), {
       isPrivate: win.isPrivate,
       windowId: win.id,
       currentTabId: win.activeTab?.id,
+      allowInline: allowInline !== false,
     });
   },
   suggestRemote(_win, text) {
@@ -223,6 +235,12 @@ const chromeApi = {
         break;
       case 'bookmarkItem':
         menus.showBookmarkItemMenu(win, args.id, pos);
+        break;
+      case 'bookmarkBar':
+        menus.showBookmarkItemMenu(win, null, pos);
+        break;
+      case 'omnibox':
+        menus.showOmniboxMenu(win, args, pos);
         break;
       default:
         break;

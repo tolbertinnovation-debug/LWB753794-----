@@ -87,7 +87,7 @@ function localSuggestions(text, opts = {}) {
   }
 
   // Inline autocomplete (only for URL-ish input without spaces).
-  if (!/\s/.test(input) && resolved && resolved.type !== 'keyword') {
+  if (opts.allowInline !== false && !/\s/.test(input) && resolved && resolved.type !== 'keyword') {
     const inline = ctx.history.inlineMatch(input);
     if (inline && inline.completion.toLowerCase().startsWith(input.toLowerCase())) {
       out.inline = inline.completion;

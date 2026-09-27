@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Downloads</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <style>
+      .dl {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 16px;
+        border-radius: 12px;
+      }
+      .dl:hover {
+        background: var(--hover);
+      }
+      .dl + .dl {
+        border-top: 1px solid var(--line);
+        border-radius: 0;
+      }
+      .dl .type {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+        color: var(--accent);
+        font-weight: 800;
+        font-size: 11px;
+        text-transform: uppercase;
+        flex: none;
+      }
+      .dl.failed .type,
+      .dl.cancelled .type {
+        background: var(--hover);
+        color: var(--text-3);
+      }
+      .dl .info {
+        flex: 1;
+        min-width: 0;
+      }
+      .dl .name {
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dl .name a {
+        color: var(--text);
+      }
+      .dl.failed .name,
+      .dl.cancelled .name,
+      .dl.deleted .name {
+        text-decoration: line-through;
+        color: var(--text-3);
+      }
+      .dl .meta {
+        color: var(--text-2);
+        font-size: 12.5px;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dl.failed .meta {
+        color: var(--danger);
+      }
+      .bar {
+        height: 6px;
+        border-radius: 3px;
+        background: var(--line);
+        margin-top: 8px;
+        overflow: hidden;
+      }
+      .bar > div {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 3px;
+        transition: width 0.3s;
+      }
+      .dl .acts {
+        display: flex;
+        gap: 6px;
+        flex: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page" style="max-width: 900px">
+      <div class="page-head">
+        <h1 id="title"></h1>
+        <div class="spacer"></div>
+        <label class="search-box"><span id="search-icon"></span><input id="q" type="search" placeholder="Search downloads" aria-label="Search downloads" /></label>
+        <button id="clear" class="btn"></button>
+      </div>
+      <div id="list"></div>
+    </div>
+    <script type="module" src="downloads.js"></script>
+  </body>
+</html>

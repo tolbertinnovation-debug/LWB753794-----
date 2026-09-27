@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>History</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <style>
+      .toolbar-sel {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        margin-bottom: 12px;
+        border-radius: 12px;
+        background: var(--accent);
+        color: var(--accent-contrast);
+        font-weight: 600;
+        box-shadow: var(--shadow);
+      }
+      .toolbar-sel .btn {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: transparent;
+        color: inherit;
+      }
+      .list-row .checkbox {
+        opacity: 0;
+      }
+      .list-row:hover .checkbox,
+      .list-row .checkbox:checked,
+      body.selecting .list-row .checkbox {
+        opacity: 1;
+      }
+      .list-row.selected {
+        background: color-mix(in srgb, var(--accent) 10%, transparent);
+      }
+      .list-row a.title {
+        color: var(--text);
+      }
+      .list-row .domain {
+        color: var(--text-3);
+        font-size: 12.5px;
+        margin-left: 8px;
+        font-weight: 400;
+      }
+      #list .card-body {
+        padding: 0 8px 8px;
+      }
+      #more {
+        text-align: center;
+        padding: 16px;
+        color: var(--text-3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="page-head">
+        <h1 id="title"></h1>
+        <div class="spacer"></div>
+        <label class="search-box"><span id="search-icon"></span><input id="q" type="search" placeholder="Search history" aria-label="Search history" /></label>
+        <button id="clear" class="btn"></button>
+      </div>
+      <div id="selbar" class="toolbar-sel" hidden></div>
+      <div id="list"></div>
+      <div id="more"></div>
+    </div>
+    <script type="module" src="history.js"></script>
+  </body>
+</html>

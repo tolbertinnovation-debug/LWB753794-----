@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Task manager</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        text-align: left;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-3);
+        font-weight: 650;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+        user-select: none;
+      }
+      th.num,
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        width: 110px;
+      }
+      td {
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      tr:hover td {
+        background: var(--hover);
+      }
+      tr.sel td {
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+      }
+      .task {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+      .task span.t {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 520px;
+      }
+      .summary {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .summary .card {
+        padding: 14px 18px;
+        flex: 1;
+        min-width: 180px;
+        margin: 0 !important;
+      }
+      .summary .num {
+        font-size: 24px;
+        font-weight: 700;
+        font-family: var(--display);
+      }
+      .summary .lbl {
+        color: var(--text-2);
+        font-size: 12.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="page-head">
+        <h1 id="title"></h1>
+        <div class="spacer"></div>
+        <button class="btn danger" id="end" disabled>End process</button>
+      </div>
+      <div class="summary" id="summary"></div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th data-k="title">Task</th><th class="num" data-k="memory">Memory</th><th class="num" data-k="cpu">CPU</th><th class="num" data-k="pid">Process ID</th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <script type="module" src="tasks.js"></script>
+  </body>
+</html>

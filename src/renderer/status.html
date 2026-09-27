@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self'" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+        font: 12px/1 system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+      }
+      #bubble {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        max-width: calc(100% - 4px);
+        height: 22px;
+        padding: 0 9px;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-top-right-radius: 8px;
+        background: #f3f4f8;
+        color: #3b4152;
+        box-shadow: 0 0 0 1px rgba(20, 25, 40, 0.12), 0 2px 8px rgba(20, 25, 40, 0.12);
+      }
+      body.dark #bubble {
+        background: #25262c;
+        color: #cfd3de;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      #bubble span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="bubble"><span id="text"></span></div>
+    <script src="status.js"></script>
+  </body>
+</html>

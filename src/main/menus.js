@@ -332,10 +332,12 @@ function showBookmarkFolderMenu(win, folderId, pos) {
 }
 
 function showBookmarkItemMenu(win, id, pos) {
-  const node = ctx.bookmarks.get(id);
-  if (!node) return;
+  const node = id ? ctx.bookmarks.get(id) : null;
+  if (id && !node) return;
   const template = [];
-  if (node.type === 'bookmark') {
+  if (!node) {
+    // Right-click on the empty part of the bar.
+  } else if (node.type === 'bookmark') {
     template.push(
       { label: 'Open in new tab', click: () => openBookmarkUrl(win, node.url, 'background') },
       { label: 'Open in new window', click: () => openBookmarkUrl(win, node.url, 'window') },
@@ -347,15 +349,54 @@ function showBookmarkItemMenu(win, id, pos) {
   } else {
     template.push(...bookmarkFolderTemplate(win, node), sep, { label: 'Rename…', click: () => win.sendChrome('bookmark-edit', { id }) });
   }
+  if (node) template.push({ label: 'Delete', click: () => ctx.bookmarks.remove(id) }, sep);
   template.push(
-    { label: 'Delete', click: () => ctx.bookmarks.remove(id) },
-    sep,
     { label: 'Add page to bookmarks bar', enabled: Boolean(win.activeTab && /^https?:/.test(win.activeTab.state.url)), click: () => win.activeTab && ctx.bookmarks.add({ parentId: 'bar', title: win.activeTab.state.title, url: win.activeTab.state.url }) },
     { label: 'Add folder', click: () => ctx.bookmarks.add({ parentId: 'bar', type: 'folder', title: 'New folder' }) },
     { label: 'Show bookmarks bar', type: 'checkbox', checked: ctx.settings.get('showBookmarksBar'), click: () => commands.run('toggleBookmarksBar') },
     { label: 'Bookmarks manager', click: () => commands.openInternal(win, 'bookmarks') },
   );
   popup(Menu.buildFromTemplate(template), win, pos);
+}
+
+/** Right-click in the address bar. */
+function showOmniboxMenu(win, args = {}, pos) {
+  const text = clipboard.readText().trim();
+  const send = (action, extra = {}) => win.sendChrome('omnibox-menu', { action, ...extra });
+  const pasteGo = text ? resolveInput(text.split(/\r?\n/)[0], searchOpts()) : null;
+  const template = [
+    { label: 'Undo', click: () => send('undo') },
+    sep,
+    { label: 'Cut', enabled: Boolean(args.hasSelection), click: () => send('cut') },
+    { label: 'Copy', enabled: Boolean(args.hasSelection), click: () => send('copy') },
+    { label: 'Paste', enabled: Boolean(text), click: () => send('paste', { text }) },
+    {
+      label: pasteGo && pasteGo.type === 'search' ? `Paste and search for “${truncate(text, 24)}”` : 'Paste and go',
+      enabled: Boolean(pasteGo),
+      click: () => pasteGo && win.activeTab?.navigate(pasteGo.url, { typed: true }),
+    },
+    { label: 'Delete', enabled: Boolean(args.hasSelection), click: () => send('delete') },
+    sep,
+    { label: 'Select all', enabled: Boolean(args.hasText), click: () => send('selectAll') },
+  ];
+  popup(Menu.buildFromTemplate(template), win, pos);
+}
+
+/** Right-click in any other text field of the browser UI (find bar, dialogs…). */
+function showUiEditMenu(win, params) {
+  if (!params.isEditable) return;
+  const wc = win.chromeView.webContents;
+  const e = params.editFlags;
+  const template = [
+    { label: 'Undo', enabled: e.canUndo, click: () => wc.undo() },
+    { label: 'Redo', enabled: e.canRedo, click: () => wc.redo() },
+    sep,
+    { label: 'Cut', enabled: e.canCut, click: () => wc.cut() },
+    { label: 'Copy', enabled: e.canCopy, click: () => wc.copy() },
+    { label: 'Paste', enabled: e.canPaste, click: () => wc.paste() },
+    { label: 'Select all', enabled: e.canSelectAll, click: () => wc.selectAll() },
+  ];
+  popup(Menu.buildFromTemplate(template), win);
 }
 
 /**
@@ -389,7 +430,7 @@ function buildApplicationMenu() {
     {
       label: app.name,
       submenu: [
-        { role: 'about', label: 'About LIB Browser', click: () => commands.run('about') },
+        { label: 'About LIB Browser', click: () => commands.run('about') },
         sep,
         ...cmd('settings', { label: 'Settings…' }),
         sep,
@@ -495,6 +536,8 @@ module.exports = {
   showRecentlyClosedMenu,
   showBookmarkFolderMenu,
   showBookmarkItemMenu,
+  showOmniboxMenu,
+  showUiEditMenu,
   openBookmarkUrl,
   buildApplicationMenu,
 };

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Keyboard shortcuts</title>
+    <link rel="stylesheet" href="/_shared/base.css" />
+    <style>
+      .grid {
+        columns: 2 420px;
+        column-gap: 16px;
+      }
+      .grid .card {
+        break-inside: avoid;
+        margin: 0 0 16px;
+      }
+      .sc-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 12px;
+        border-radius: 8px;
+      }
+      .sc-row + .sc-row {
+        border-top: 1px solid var(--line);
+      }
+      .sc-row .label {
+        flex: 1;
+      }
+      .sc-row .keys {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="page-head">
+        <h1 id="title"></h1>
+        <div class="spacer"></div>
+        <label class="search-box"><span id="search-icon"></span><input id="q" type="search" placeholder="Search shortcuts" aria-label="Search shortcuts" /></label>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+    <script type="module" src="shortcuts.js"></script>
+  </body>
+</html>

@@ -1433,6 +1433,16 @@ body.sidebar-collapsed .vt-new {
   box-shadow: var(--shadow);
 }
 
+#content-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#content-layer > * {
+  pointer-events: auto;
+}
+
 /* ---------- Popups ---------- */
 #popup-layer {
   position: fixed;
@@ -1479,6 +1489,10 @@ body.sidebar-collapsed .vt-new {
 .popup.open {
   opacity: 1;
   transform: none;
+}
+
+.popup > * {
+  min-height: 0;
 }
 
 .popup.closing {
