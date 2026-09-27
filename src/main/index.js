@@ -96,7 +96,7 @@ app.on('open-file', (event, file) => {
 
 function initServices() {
   const dir = ctx.userDataPath;
-  ctx.settings = new Settings(path.join(dir, 'settings.json'), app.getPath('downloads'));
+  ctx.settings = new Settings(path.join(dir, 'settings.json'), process.env.LIB_TEST_DOWNLOADS || app.getPath('downloads'));
   ctx.history = new History(path.join(dir, 'history.json'));
   ctx.bookmarks = new Bookmarks(path.join(dir, 'bookmarks.json'));
   ctx.downloads = new DownloadManager(path.join(dir, 'downloads.json'));

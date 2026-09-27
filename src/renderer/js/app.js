@@ -68,6 +68,15 @@ function reportLayout() {
   send('layout', insets);
 }
 
+// Events can arrive while the UI is still initializing; replay them after.
+let initialized = false;
+const pending = [];
+
+function onEvent(name, payload) {
+  if (!initialized) pending.push([name, payload]);
+  else handleEvent(name, payload);
+}
+
 function handleEvent(name, payload) {
   switch (name) {
     case 'tabs':
@@ -129,7 +138,7 @@ function handleEvent(name, payload) {
 }
 
 async function init() {
-  window.lib.onEvent(handleEvent);
+  window.lib.onEvent(onEvent);
   const initial = await invoke('ready');
   Object.assign(state, {
     windowId: initial.windowId,
@@ -170,6 +179,8 @@ async function init() {
   new ResizeObserver(reportLayout).observe($('#content'));
   window.addEventListener('resize', reportLayout);
   reportLayout();
+  initialized = true;
+  for (const [name, payload] of pending.splice(0)) handleEvent(name, payload);
   document.body.classList.add('ready');
 }
 

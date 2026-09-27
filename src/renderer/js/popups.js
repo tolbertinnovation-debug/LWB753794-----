@@ -85,29 +85,40 @@ export function openPopup(el, opts = {}) {
 function position(wrap, opts) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
+  wrap.style.maxHeight = '';
   const rect = wrap.getBoundingClientRect();
   const w = rect.width;
   const hgt = rect.height;
   const gap = opts.offset ?? 6;
   let x;
   let y;
+  let maxH = vh - 16;
   const placement = opts.placement || 'bottom-start';
-  if (placement === 'center' || !opts.anchor) {
+  if (placement === 'center' || placement === 'top-center' || !opts.anchor) {
     x = (vw - w) / 2;
     y = placement === 'top-center' ? 72 : Math.max(56, (vh - hgt) / 3);
+    maxH = vh - y - 16;
   } else {
     const a = opts.anchor instanceof Element ? opts.anchor.getBoundingClientRect() : opts.anchor;
-    y = a.bottom + gap;
     if (placement === 'bottom-end') x = a.right - w;
     else if (placement === 'bottom-center') x = a.left + a.width / 2 - w / 2;
     else x = a.left;
-    if (y + hgt > vh - 8 && a.top - gap - hgt > 8) y = a.top - gap - hgt;
+    const below = vh - (a.bottom + gap) - 8;
+    const above = a.top - gap - 8;
+    if (hgt <= below || below >= above) {
+      // Stay attached below the anchor; scroll if taller than the space.
+      y = a.bottom + gap;
+      maxH = below;
+    } else {
+      maxH = above;
+      y = a.top - gap - Math.min(hgt, above);
+    }
   }
   x = Math.max(8, Math.min(x, vw - w - 8));
-  y = Math.max(8, Math.min(y, vh - hgt - 8));
+  y = Math.max(8, y);
   wrap.style.left = `${Math.round(x)}px`;
   wrap.style.top = `${Math.round(y)}px`;
-  wrap.style.maxHeight = `${vh - 16}px`;
+  wrap.style.maxHeight = `${Math.max(120, Math.round(maxH))}px`;
 }
 
 export function closeAllPopups() {

@@ -202,8 +202,8 @@ export async function openBookmarkEditor(anchor, { id } = {}) {
     folder.append(h('option', { value: f.id }, `${' '.repeat(f.depth)}${f.title}`));
   }
   folder.value = info.parentId || 'bar';
-  const done = h('button.btn.primary', {}, 'Done');
-  const remove = h('button.btn.danger', {}, 'Remove');
+  const done = h('button.btn.primary', { type: 'submit' }, 'Done');
+  const remove = h('button.btn.danger', { type: 'button' }, 'Remove');
   const form = h(
     'form.dialog',
     {},

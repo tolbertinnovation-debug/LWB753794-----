@@ -21,6 +21,12 @@ let nextTabId = 1;
 /** Accepted certificate exceptions for this run: "host|fingerprint". */
 const certExceptions = new Set();
 
+/** A view's WebContents, or null once it has been destroyed. */
+function liveContents(view) {
+  const wc = view?.webContents;
+  return wc && !wc.isDestroyed() ? wc : null;
+}
+
 function isInternal(url) {
   return typeof url === 'string' && url.startsWith('lib://');
 }
@@ -86,7 +92,7 @@ class Tab extends EventEmitter {
   }
 
   get webContents() {
-    return this.view && !this.view.webContents.isDestroyed() ? this.view.webContents : null;
+    return liveContents(this.view);
   }
 
   get isActive() {
@@ -125,7 +131,7 @@ class Tab extends EventEmitter {
 
   /** Make sure the tab has a live WebContents (wakes discarded tabs). */
   ensureView() {
-    if (this.view && !this.view.webContents.isDestroyed()) return;
+    if (liveContents(this.view)) return;
     this._createView();
     const saved = this.savedHistory;
     this.savedHistory = null;
@@ -313,8 +319,12 @@ class Tab extends EventEmitter {
     }
     const background = disposition === 'background-tab';
     const newWindow = disposition === 'new-window';
+    // Child WebContents don't inherit the preload; give tabs opened by pages
+    // the same preferences as any other tab (session is always the opener's).
+    const { session: _s, ...childPrefs } = this._webPreferences();
     return {
       action: 'allow',
+      overrideBrowserWindowOptions: { webPreferences: childPrefs },
       createWindow: (options) => {
         const targetWin = newWindow ? require('./windows').createWindow({ isPrivate: this.isPrivate, empty: true }) : this.win;
         const tab = targetWin.createTab({
@@ -419,7 +429,8 @@ class Tab extends EventEmitter {
     this._emitUpdate();
     const wc = this.webContents;
     if (wc) {
-      wc.executeJavaScript(injectionScript(this.errorInfo)).catch(() => {});
+      const dark = this.isPrivate || require('./ipc').isDarkTheme();
+      wc.executeJavaScript(injectionScript(this.errorInfo, dark)).catch(() => {});
     }
   }
 
@@ -548,7 +559,9 @@ class Tab extends EventEmitter {
       this.win.onFindResult(this, { matches: 0, activeMatchOrdinal: 0, finalUpdate: true });
       return;
     }
-    wc.findInPage(text, { forward: opts.forward !== false, findNext: Boolean(opts.findNext), matchCase: Boolean(opts.matchCase) });
+    // Electron's `findNext: true` *starts a new session*; our opts.findNext
+    // means "step to the next match of the current search".
+    wc.findInPage(text, { forward: opts.forward !== false, findNext: !opts.findNext, matchCase: Boolean(opts.matchCase) });
   }
 
   stopFind(action = 'keepSelection') {
@@ -593,7 +606,7 @@ class Tab extends EventEmitter {
     if (!view) return;
     this.win.detachView(view);
     this.view = null;
-    if (!view.webContents.isDestroyed()) view.webContents.close();
+    liveContents(view)?.close();
     this.closeDevTools();
   }
 
@@ -624,7 +637,7 @@ class Tab extends EventEmitter {
     if (wc && wc.isDevToolsOpened()) wc.closeDevTools();
     if (this.devtoolsView) {
       this.win.detachView(this.devtoolsView);
-      if (!this.devtoolsView.webContents.isDestroyed()) this.devtoolsView.webContents.close();
+      liveContents(this.devtoolsView)?.close();
       this.devtoolsView = null;
     }
     if (this.state.devtools) {
@@ -731,4 +744,4 @@ class Tab extends EventEmitter {
   }
 }
 
-module.exports = { Tab, NEWTAB_URL, ZOOM_LEVELS, isInternal };
+module.exports = { Tab, NEWTAB_URL, ZOOM_LEVELS, isInternal, liveContents };

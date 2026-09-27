@@ -1,0 +1,4 @@
+! Test filter list used by the e2e suite (LIB_TEST_ADBLOCK_LIST)
+||127.0.0.1^*/ads/
+/tracker.js
+##.ad-banner

@@ -30,7 +30,7 @@ export function openAppMenu(anchor) {
   };
   quick.append(
     quickBtn(isDark() ? 'Light' : 'Dark', isDark() ? 'sun' : 'moon', false, () => run('toggleTheme')),
-    quickBtn('Vertical tabs', 'sidebar', state.settings.verticalTabs, () => run('toggleVerticalTabs')),
+    quickBtn('Sidebar', 'sidebar', state.settings.verticalTabs, () => run('toggleVerticalTabs')),
     quickBtn('Split view', 'split', Boolean(state.split), () => run(state.split ? 'closeSplit' : 'splitView')),
     quickBtn('Screenshot', 'camera', false, () => run('screenshot')),
   );

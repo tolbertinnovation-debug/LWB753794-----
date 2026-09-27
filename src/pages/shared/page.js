@@ -24,13 +24,19 @@ export function applyAccent(color) {
   document.documentElement.style.setProperty('--accent-contrast', luminance(color) > 0.45 ? '#111318' : '#ffffff');
 }
 
-/** Load settings once and keep the accent colour in sync. */
+export function applyTheme(dark) {
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+}
+
+/** Load settings once and keep the theme and accent colour in sync. */
 export async function initPage() {
   const data = await call('getSettings');
+  applyTheme(data.dark);
   applyAccent(data.settings.accentColor);
   lib.on('settings', ({ key, value }) => {
     if (key === 'accentColor') applyAccent(value);
   });
+  lib.on('theme', ({ dark }) => applyTheme(dark));
   return data;
 }
 

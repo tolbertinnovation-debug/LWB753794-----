@@ -16,6 +16,12 @@ const { ACCENTS } = require('./settings');
 const { getBrowsingSession } = require('./sessions');
 const { PROMPTABLE } = require('./permissions');
 
+/** Effective theme (settings + OS), independent of Chromium's media queries. */
+function isDarkTheme() {
+  const theme = ctx.settings.get('theme');
+  return theme === 'dark' || (theme === 'system' && nativeTheme.shouldUseDarkColors);
+}
+
 function searchOpts() {
   return { searchEngine: ctx.settings.get('searchEngine'), customSearchUrl: ctx.settings.get('customSearchUrl') };
 }
@@ -92,7 +98,9 @@ const chromeApi = {
     win.focusPage();
   },
   setTitleBarOverlay(win, opts) {
-    if (process.platform === 'darwin' || !opts) return;
+    if (!opts) return;
+    if (/^#[0-9a-f]{6}$/i.test(opts.color || '')) win.win.setBackgroundColor(opts.color);
+    if (process.platform === 'darwin') return;
     try {
       const o = {};
       if (/^#[0-9a-f]{6,8}$/i.test(opts.color || '')) o.color = opts.color;
@@ -483,6 +491,7 @@ const pageApi = {
       accents: ACCENTS,
       platform: process.platform,
       systemDark: nativeTheme.shouldUseDarkColors,
+      dark: isDarkTheme(),
     };
   },
   setSetting(_tab, key, value) {
@@ -780,7 +789,10 @@ function register() {
     }
   };
   ctx.settings.on('change', (key, value) => {
-    if (key === 'theme') nativeTheme.themeSource = value;
+    if (key === 'theme') {
+      nativeTheme.themeSource = value;
+      broadcastPages('theme', { dark: isDarkTheme() });
+    }
     for (const w of windows.all()) {
       w.sendChrome('settings', chromeSettings());
       if (key === 'adblockEnabled' || key === 'adblockAllowlist') w._scheduleSync();
@@ -792,6 +804,7 @@ function register() {
   });
   nativeTheme.on('updated', () => {
     for (const w of windows.all()) w.sendChrome('settings', chromeSettings());
+    broadcastPages('theme', { dark: isDarkTheme() });
   });
   ctx.bookmarks.on('changed', () => {
     const bar = bookmarksBar();
@@ -827,4 +840,4 @@ function register() {
   });
 }
 
-module.exports = { register, chromeSettings, clearBrowsingData };
+module.exports = { register, chromeSettings, clearBrowsingData, isDarkTheme };

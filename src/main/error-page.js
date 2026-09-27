@@ -129,7 +129,7 @@ function buildErrorPage(info) {
   const title = d.title;
   const html = `<head><meta charset="utf-8"><title>${esc(host || title)}</title><meta name="color-scheme" content="light dark"><style>
 :root{--bg:#f6f7fb;--fg:#1d1f27;--muted:#5d6272;--card:#fff;--line:#e6e8ef;--accent:${accent}}
-@media (prefers-color-scheme:dark){:root{--bg:#15161c;--fg:#eceef4;--muted:#a1a6b6;--card:#1d1f27;--line:#2c2f3a}}
+:root.dark{--bg:#15161c;--fg:#eceef4;--muted:#a1a6b6;--card:#1d1f27;--line:#2c2f3a;color-scheme:dark}
 *{box-sizing:border-box}html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif;display:flex;align-items:center;justify-content:center;padding:32px}
 main{max-width:600px;width:100%;animation:in .35s ease-out}
@@ -156,9 +156,9 @@ details{margin-top:24px;color:var(--muted)}summary{cursor:pointer;font-weight:60
 }
 
 /** JavaScript that replaces the committed error document with our page. */
-function injectionScript(info) {
+function injectionScript(info, dark = false) {
   const { html } = buildErrorPage(info);
-  return `(() => { document.documentElement.innerHTML = ${JSON.stringify(html)}; })();`;
+  return `(() => { document.documentElement.innerHTML = ${JSON.stringify(html)}; document.documentElement.classList.toggle('dark', ${Boolean(dark)}); })();`;
 }
 
 module.exports = { buildErrorPage, injectionScript, isCertError };

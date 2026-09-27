@@ -29,10 +29,10 @@ function setCount(result) {
   count.classList.toggle('none', result.matches === 0);
 }
 
-export function openFind() {
+export function openFind(msg = {}) {
   const bar = $('#findbar');
   bar.hidden = false;
-  openTabId = state.activeId;
+  openTabId = msg.tabId ?? state.activeId;
   input.value = lastText;
   input.focus();
   input.select();
@@ -86,7 +86,11 @@ export function initFindbar() {
     else if (input.value) find({ findNext: true, forward });
   });
   bus.on('find-result', setCount);
+  // Switching to another tab closes the find bar (like Chrome).
+  let lastActive = state.activeId;
   bus.on('tabs', () => {
+    if (state.activeId === lastActive) return;
+    lastActive = state.activeId;
     if (isOpen() && openTabId !== state.activeId) closeFind({ focusPage: false });
   });
 }

@@ -288,7 +288,7 @@ body.suggesting #search {
 #tiles {
   margin-top: 44px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 104px);
+  grid-template-columns: repeat(auto-fit, 104px);
   justify-content: center;
   gap: 10px 8px;
   width: min(860px, 100%);
@@ -640,6 +640,6 @@ body.private #bg {
     grid-template-columns: 1fr;
   }
   #tiles {
-    grid-template-columns: repeat(auto-fill, 88px);
+    grid-template-columns: repeat(auto-fit, 88px);
   }
 }

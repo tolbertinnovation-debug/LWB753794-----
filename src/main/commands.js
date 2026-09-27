@@ -278,7 +278,7 @@ const BY_ID = new Map(COMMANDS.map((c) => [c.id, c]));
 function openFind(win) {
   if (!win) return;
   win.chromeView.webContents.focus();
-  win.sendChrome('find-open', {});
+  win.sendChrome('find-open', { tabId: win.activeTab?.id ?? null });
 }
 
 function openPalette(win) {

@@ -3,7 +3,7 @@
 const path = require('node:path');
 const { BaseWindow, WebContentsView, nativeTheme, screen, app } = require('electron');
 const ctx = require('./context');
-const { Tab, NEWTAB_URL } = require('./tab');
+const { Tab, NEWTAB_URL, liveContents } = require('./tab');
 const { getBrowsingSession, resetPrivateSession } = require('./sessions');
 
 const RENDERER_HTML = path.join(__dirname, '..', 'renderer', 'index.html');
@@ -314,8 +314,11 @@ class BrowserWindowController {
     const fsTab = this.htmlFullscreenTab;
     if (fsTab && fsTab.view) {
       fsTab.view.setBounds({ x: 0, y: 0, width, height });
+      fsTab.view.setBorderRadius(0);
       return;
     }
+    // Vertical-tabs layout floats the page as a rounded card.
+    const radius = ctx.settings.get('verticalTabs') ? 10 : 0;
     const ins = this.insets;
     const area = {
       x: ins.left,
@@ -354,7 +357,10 @@ class BrowserWindowController {
           rect = { ...rect, height: pageH };
         }
       }
-      if (tab.view) tab.view.setBounds(rect);
+      if (tab.view) {
+        tab.view.setBounds(rect);
+        tab.view.setBorderRadius(radius);
+      }
       layoutInfo.panes.push({ tabId: tab.id, ...rect, crashed: tab.state.crashed });
     });
     this._layoutInfo = layoutInfo;
@@ -495,16 +501,18 @@ class BrowserWindowController {
   async closeTab(tab, { force = false } = {}) {
     if (!tab || !this.tabs.includes(tab) || tab._closePending) return;
     tab._closePending = true;
+    // Capture back/forward history now: it's gone once the page is destroyed.
+    const snapshot = tab.serialize();
     const closed = await tab.close(force);
     tab._closePending = false;
     if (!closed) return;
-    this._removeTab(tab);
+    this._removeTab(tab, { snapshot });
   }
 
-  _removeTab(tab, { keepAlive = false } = {}) {
+  _removeTab(tab, { keepAlive = false, snapshot = null } = {}) {
     const index = this.tabs.indexOf(tab);
     if (index < 0) return;
-    if (!keepAlive && !this.isPrivate) ctx.sessionState?.pushClosedTab(tab.serialize(), index, this.id);
+    if (!keepAlive && !this.isPrivate) ctx.sessionState?.pushClosedTab(snapshot || tab.serialize(), index, this.id);
     this.tabs.splice(index, 1);
     for (const [id, req] of this.authRequests) {
       if (req.tab === tab) {
@@ -793,7 +801,7 @@ class BrowserWindowController {
     this.authRequests.clear();
     this.tabs = [];
     for (const view of [this.chromeView, this.statusView]) {
-      if (view && !view.webContents.isDestroyed()) view.webContents.close();
+      liveContents(view)?.close();
     }
     const windows = require('./windows');
     windows.unregister(this);

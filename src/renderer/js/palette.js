@@ -25,7 +25,7 @@ const COMMAND_ICONS = {
   find: 'search',
   zoomIn: 'zoomIn',
   zoomOut: 'zoomOut',
-  zoomReset: 'search',
+  zoomReset: 'zoomIn',
   reader: 'reader',
   print: 'printer',
   savePage: 'save',

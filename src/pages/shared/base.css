@@ -29,8 +29,8 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Dark theme: driven by the browser (data-theme) with the media query as fallback. */
+:root[data-theme='dark'] {
     --bg: #17181c;
     --bg-2: #1d1e23;
     --card: #222329;
@@ -49,7 +49,28 @@
     --ok: #3ccf82;
     --warn: #f5a524;
     color-scheme: dark;
-  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #17181c;
+    --bg-2: #1d1e23;
+    --card: #222329;
+    --card-2: #1c1d22;
+    --text: #eceef4;
+    --text-2: #aeb3c1;
+    --text-3: #7c8292;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.14);
+    --hover: rgba(255, 255, 255, 0.06);
+    --press: rgba(255, 255, 255, 0.1);
+    --field: #1a1b20;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+    --danger: #ff6b6f;
+    --ok: #3ccf82;
+    --warn: #f5a524;
+    color-scheme: dark;  }
 }
 
 * {

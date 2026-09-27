@@ -1,0 +1,4 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Key Capture</title></head>
+<body style="font:16px system-ui;margin:40px"><h1>This page handles Ctrl+F itself</h1>
+<script>window.captured = 0; document.addEventListener('keydown', (e) => { if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'f') { e.preventDefault(); window.captured++; } });</script></body></html>
