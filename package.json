@@ -1,7 +1,7 @@
 {
   "name": "lib-web-browser",
   "productName": "LIB Browser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "LIB Browser — a fast, private, beautiful web browser built on Chromium.",
   "desktopName": "lib-browser.desktop",
   "main": "src/main/index.js",
