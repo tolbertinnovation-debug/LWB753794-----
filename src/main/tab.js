@@ -437,6 +437,7 @@ class Tab extends EventEmitter {
     this.state.url = url;
     this.state.blocked = 0;
     this._pendingBlocked = null;
+    this.state.readerable = false;
     this.state.title = hostOf(url) || url;
     this.state.loading = false;
     this._syncNavState();
@@ -712,6 +713,7 @@ class Tab extends EventEmitter {
     let security = 'none';
     if (isInternal(url)) security = 'internal';
     else if (this.state.errorCode && isCertError(this.state.errorCode)) security = 'dangerous';
+    else if (this.state.errorCode) security = 'none'; // an error page: nothing was loaded securely
     else if (url.startsWith('https:')) security = this.state.certOverride ? 'dangerous' : 'secure';
     else if (url.startsWith('http:')) security = 'insecure';
     else if (url.startsWith('file:')) security = 'file';

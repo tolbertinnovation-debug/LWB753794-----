@@ -3,7 +3,7 @@
 // End-to-end tests: drive the real browser (Electron) against a local
 // fixture site. Run with `npm run test:e2e` (needs a display; CI uses xvfb).
 
-const { describe, it, before, after } = require('node:test');
+const { describe, it, before, after, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -27,6 +27,11 @@ describe('LIB Browser', { timeout: 240000 }, () => {
   after(async () => {
     await app?.close().catch(() => {});
     await srv?.close();
+  });
+
+  // A popup left open would block clicks in every later test: fail the test that left it.
+  afterEach(async () => {
+    await waitFor(() => chrome.evaluate(() => !document.querySelector('#popup-layer .popup-backdrop')), 3000, 'popups closed after the test');
   });
 
   const active = async () => {
@@ -178,8 +183,9 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     await waitActive((t) => t.title === 'Second Page' && !t.loading, 'page 2');
     await chrome.click('#btn-star');
     await waitFor(() => main(app, (lib, u) => lib.ctx.bookmarks.isBookmarked(u), `${srv.base}/page2.html`), 5000, 'bookmarked');
-    await chrome.waitForSelector('form.dialog');
-    await chrome.keyboard.press('Enter');
+    // Press Enter in the editor itself: it moves focus to its Name field a tick after opening.
+    await chrome.locator('form.dialog').last().locator('input[type=text]').first().press('Enter');
+    await chrome.waitForSelector('form.dialog', { state: 'detached' });
     await waitFor(() => chrome.evaluate(() => [...document.querySelectorAll('#bookmarks-bar .bm-item')].some((b) => b.textContent.includes('Second Page'))), 5000, 'bookmarks bar item');
     assert.equal((await active()).bookmarked, true);
   });
@@ -220,6 +226,7 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     await navigate('http://127.0.0.1:1/');
     const t = await waitActive((x) => x.errorCode !== 0, 'error');
     assert.equal(t.url, 'http://127.0.0.1:1/');
+    assert.equal(t.security, 'none', 'error pages show neither a padlock nor a warning');
     const heading = await waitFor(
       () => main(app, (lib) => lib.windows.getFocusedWindow().activeTab.webContents.executeJavaScript("document.querySelector('h1') && document.querySelector('h1').textContent")),
       5000,
@@ -263,6 +270,12 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     await page.waitForSelector('#content p');
     assert.equal(await page.textContent('#headline'), 'A Short History of Web Browsers');
     assert.equal(await page.evaluate(() => document.querySelectorAll('#content script, nav').length), 0);
+    // A page that fails to load doesn't keep the previous page's reader button.
+    await navigate(`${srv.base}/article.html?again`);
+    await waitActive((t) => t.readerable, 'readerable again');
+    await navigate('http://127.0.0.1:1/');
+    const failed = await waitActive((t) => t.errorCode !== 0, 'error page');
+    assert.equal(failed.readerable, false);
   });
 
   it('computes math in the address bar', async () => {
