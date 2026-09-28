@@ -3,7 +3,7 @@
 // End-to-end tests: drive the real browser (Electron) against a local
 // fixture site. Run with `npm run test:e2e` (needs a display; CI uses xvfb).
 
-const { describe, it, before, after } = require('node:test');
+const { describe, it, before, after, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -27,6 +27,11 @@ describe('LIB Browser', { timeout: 240000 }, () => {
   after(async () => {
     await app?.close().catch(() => {});
     await srv?.close();
+  });
+
+  // A popup left open would block clicks in every later test: fail the test that left it.
+  afterEach(async () => {
+    await waitFor(() => chrome.evaluate(() => !document.querySelector('#popup-layer .popup-backdrop')), 3000, 'popups closed after the test');
   });
 
   const active = async () => {
@@ -178,8 +183,9 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     await waitActive((t) => t.title === 'Second Page' && !t.loading, 'page 2');
     await chrome.click('#btn-star');
     await waitFor(() => main(app, (lib, u) => lib.ctx.bookmarks.isBookmarked(u), `${srv.base}/page2.html`), 5000, 'bookmarked');
-    await chrome.waitForSelector('form.dialog');
-    await chrome.keyboard.press('Enter');
+    // Press Enter in the editor itself: it moves focus to its Name field a tick after opening.
+    await chrome.locator('form.dialog').last().locator('input[type=text]').first().press('Enter');
+    await chrome.waitForSelector('form.dialog', { state: 'detached' });
     await waitFor(() => chrome.evaluate(() => [...document.querySelectorAll('#bookmarks-bar .bm-item')].some((b) => b.textContent.includes('Second Page'))), 5000, 'bookmarks bar item');
     assert.equal((await active()).bookmarked, true);
   });
