@@ -220,6 +220,7 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     await navigate('http://127.0.0.1:1/');
     const t = await waitActive((x) => x.errorCode !== 0, 'error');
     assert.equal(t.url, 'http://127.0.0.1:1/');
+    assert.equal(t.security, 'none', 'error pages show neither a padlock nor a warning');
     const heading = await waitFor(
       () => main(app, (lib) => lib.windows.getFocusedWindow().activeTab.webContents.executeJavaScript("document.querySelector('h1') && document.querySelector('h1').textContent")),
       5000,
@@ -263,6 +264,12 @@ describe('LIB Browser', { timeout: 240000 }, () => {
     await page.waitForSelector('#content p');
     assert.equal(await page.textContent('#headline'), 'A Short History of Web Browsers');
     assert.equal(await page.evaluate(() => document.querySelectorAll('#content script, nav').length), 0);
+    // A page that fails to load doesn't keep the previous page's reader button.
+    await navigate(`${srv.base}/article.html?again`);
+    await waitActive((t) => t.readerable, 'readerable again');
+    await navigate('http://127.0.0.1:1/');
+    const failed = await waitActive((t) => t.errorCode !== 0, 'error page');
+    assert.equal(failed.readerable, false);
   });
 
   it('computes math in the address bar', async () => {
