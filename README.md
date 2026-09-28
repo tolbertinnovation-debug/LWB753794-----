@@ -101,7 +101,9 @@ On macOS, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>. The full list is in the
 
 Web apps get the first chance at shortcuts like <kbd>Ctrl</kbd>+<kbd>F</kbd>, <kbd>Ctrl</kbd>+<kbd>S</kbd> and <kbd>Ctrl</kbd>+<kbd>U</kbd>, so Google Docs and web editors keep working. The browser handles them only when the page doesn't.
 
-## Build from source
+## Development
+
+These instructions are for LIB Browser's developers. Copying or reusing the code requires permission; see [License](#license).
 
 Requirements: [Node.js](https://nodejs.org) 22 or newer.
 
@@ -161,4 +163,8 @@ LIB has no accounts, no telemetry and no crash uploads. Your history, bookmarks 
 
 ## License
 
-[MIT](LICENSE). Built on Chromium, Electron, the Ghostery ad-blocking engine (MPL-2.0) and Mozilla Readability (Apache-2.0).
+Copyright © 2026 Tolbert Innovation. All rights reserved.
+
+The source code is published for viewing only. Copying, modifying or redistributing it requires written permission from Tolbert Innovation; see [LICENSE](LICENSE). The official installers on the [Releases page](https://github.com/tolbertinnovation-debug/Lib-Web-browser/releases/latest) are free to download and use.
+
+LIB Browser is built on Chromium, Electron, the Ghostery ad-blocking engine (MPL-2.0) and Mozilla Readability (Apache-2.0). These components remain under their own licenses.

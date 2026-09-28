@@ -6,10 +6,10 @@
   "desktopName": "lib-browser.desktop",
   "main": "src/main/index.js",
   "author": {
-    "name": "LIB Browser",
+    "name": "Tolbert Innovation",
     "email": "tolbertinnovation-debug@users.noreply.github.com"
   },
-  "license": "MIT",
+  "license": "UNLICENSED",
   "private": true,
   "homepage": "https://github.com/tolbertinnovation-debug/Lib-Web-browser",
   "repository": {
@@ -45,7 +45,7 @@
     "appId": "com.lib.browser",
     "productName": "LIB Browser",
     "executableName": "lib-browser",
-    "copyright": "Copyright © 2026 LIB Browser",
+    "copyright": "Copyright © 2026 Tolbert Innovation. All rights reserved.",
     "directories": {
       "output": "dist",
       "buildResources": "build"
