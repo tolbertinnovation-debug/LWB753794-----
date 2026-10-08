@@ -239,6 +239,8 @@ function showTabContextMenu(win, tab, pos) {
     sep,
     { label: 'Reload', click: () => tab.reload() },
     { label: 'Duplicate', click: () => win.duplicateTab(tab) },
+    { label: 'Close duplicate tabs', click: () => commands.run('closeDuplicateTabs', { win }) },
+    { label: 'Sleep background tabs', click: () => commands.run('sleepBackgroundTabs', { win }) },
     { label: tab.state.pinned ? 'Unpin' : 'Pin', click: () => win.togglePin(tab) },
     { label: tab.state.muted ? 'Unmute site' : 'Mute site', click: () => tab.setMuted(!tab.state.muted) },
     sep,

@@ -8,6 +8,9 @@ let selectedTab = null;
 async function refresh() {
   const rows = await call('taskList');
   rows.sort((a, b) => (sortKey === 'title' ? String(a.title).localeCompare(b.title) : (b[sortKey] || 0) - (a[sortKey] || 0)));
+  const selected = rows.find((r) => r.tabId === selectedTab && r.kind === 'tab');
+  if (!selected) selectedTab = null;
+  $('#end').disabled = !selected || Boolean(selected.sleeping);
   const body = $('#rows');
   body.textContent = '';
   let mem = 0;
@@ -69,7 +72,16 @@ async function main() {
     }),
   );
   await refresh();
-  setInterval(refresh, 2000);
+  // Pause polling in background tabs; serialize refreshes to avoid stale results.
+  let busy = false;
+  const poll = async () => {
+    if (busy || document.hidden) return;
+    busy = true;
+    try { await refresh(); } catch (err) { console.error('Task manager refresh failed', err); }
+    finally { busy = false; }
+  };
+  setInterval(poll, 2000);
+  document.addEventListener('visibilitychange', poll);
 }
 
 main();
