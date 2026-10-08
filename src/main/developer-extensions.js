@@ -2,7 +2,7 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { dialog } = require('electron');
+const { app, dialog } = require('electron');
 const busy = new WeakSet();
 
 async function guide(win) {
@@ -58,4 +58,18 @@ async function manage(win) {
   }
 }
 
-module.exports = { manage, guide };
+async function loadResourceExporter(win) {
+  if (!win || win.isPrivate) {
+    if (win) await dialog.showMessageBox(win.win, { message: 'Resource exporter is available in normal windows only.' });
+    return;
+  }
+  try {
+    const folder = app.isPackaged ? path.join(process.resourcesPath, 'resources', 'resource-exporter') : path.join(__dirname, '../../resources/resource-exporter');
+    await win.session.extensions.loadExtension(folder, { allowFileAccess: false });
+    win.sendChrome('toast', { message: 'Resource exporter loaded. Reopen F12, select LIB Resources, reload the page, then download its ZIP.' });
+  } catch (err) {
+    await dialog.showMessageBox(win.win, { type: 'error', message: 'Could not load resource exporter', detail: String(err.message) });
+  }
+}
+
+module.exports = { manage, guide, loadResourceExporter };
