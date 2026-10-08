@@ -103,12 +103,13 @@ function initServices() {
   ctx.permissions = new PermissionManager();
   ctx.sitePrefs = new SitePrefs(path.join(dir, 'site-prefs.json'));
   ctx.adblock = new AdBlocker(dir);
+  ctx.workspaces = new (require('./workspaces').Workspaces)(path.join(dir, 'workspaces.json'));
   ctx.sessionState = new SessionState(path.join(dir, 'session.json'));
   nativeTheme.themeSource = ctx.settings.get('theme');
 }
 
 function flushAll() {
-  for (const key of ['settings', 'history', 'bookmarks', 'downloads', 'sitePrefs', 'adblock']) {
+  for (const key of ['settings', 'history', 'bookmarks', 'downloads', 'sitePrefs', 'adblock', 'workspaces']) {
     try {
       ctx[key]?.flush();
     } catch (err) {

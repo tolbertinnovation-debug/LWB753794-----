@@ -285,6 +285,8 @@ const COMMANDS = [
     tab?.navigate('lib://settings/#vpn');
   } },
 
+  { id: 'workspaces', label: 'Saved workspaces', section: 'Tabs', run: ({ win }) => openInternal(win, 'workspaces') },
+
   // Library
   { id: 'bookmarkPage', label: 'Bookmark this page', section: 'Bookmarks', keys: ['CmdOrCtrl+D'], pageFirst: true, run: ({ win }) => win?.sendChrome('bookmark-edit', {}) },
   {

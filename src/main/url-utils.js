@@ -13,6 +13,7 @@ const INTERNAL_PAGES = new Set([
   'reader',
   'shortcuts',
   'tasks',
+  'workspaces',
 ]);
 
 // Aliases so muscle memory from other browsers works: chrome://settings etc.

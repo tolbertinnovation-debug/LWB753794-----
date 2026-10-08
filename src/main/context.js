@@ -27,6 +27,7 @@ const ctx = {
   sitePrefs: null,
   adblock: null,
   sessionState: null,
+  workspaces: null,
   userDataPath: '',
   isTest: false,
   quitting: false,
