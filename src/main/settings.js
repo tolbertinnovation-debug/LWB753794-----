@@ -60,7 +60,7 @@ function defaults(downloadsPath) {
 
 /** Validators keep bad values (from sync files or buggy pages) out of the store. */
 const VALIDATORS = {
-  dataSaverMode: v => ['off', 'balanced', 'maximum'].includes(v),
+  dataSaverMode: v => v === 'off',
   dataSaverAllowlist: v => Array.isArray(v) && v.length <= 200 && v.every(host => typeof host === 'string' && /^[a-z0-9.-]+$/i.test(host) && host.length <= 253),
   startup: (v) => ['restore', 'newtab', 'homepage'].includes(v),
   homepage: (v) => typeof v === 'string' && v.length < 4096,
@@ -93,16 +93,17 @@ class Settings extends EventEmitter {
     this.setMaxListeners(100);
     this._defaults = defaults(downloadsPath);
     this.store = new JsonStore(filePath, () => ({ ...this._defaults }), {
-      migrate: (data) => ({ ...this._defaults, ...(data && typeof data === 'object' ? data : {}) }),
+      migrate: (data) => ({ ...this._defaults, ...(data && typeof data === 'object' ? data : {}), dataSaverMode: 'off' }),
     });
   }
 
   get(key) {
+    if (key === 'dataSaverMode') return 'off';
     return this.store.data[key];
   }
 
   all() {
-    return { ...this.store.data };
+    return { ...this.store.data, dataSaverMode: 'off' };
   }
 
   /**

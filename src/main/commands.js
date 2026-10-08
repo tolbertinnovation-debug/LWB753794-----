@@ -334,21 +334,6 @@ const COMMANDS = [
     },
   },
 
-  { id: 'dataSaverSettings', label: 'Data Saver settings', section: 'View', run: ({ win }) => { const t = openInternal(win, 'settings'); t?.navigate('lib://settings/#data-saver'); } },
-  { id: 'toggleDataSaver', label: 'Data Saver on / off', section: 'View', run: ({ win }) => {
-    const on = ctx.settings.get('dataSaverMode') !== 'off';
-    ctx.settings.set('dataSaverMode', on ? 'off' : 'balanced');
-    win?.sendChrome('toast', { message: `Data Saver ${on ? 'off' : 'on (Balanced)'}. Reload pages to apply.` });
-  } },
-  { id: 'toggleDataSaverSite', label: 'Allow / save data on this site', section: 'View', run: ({ win, tab }) => {
-    if (!tab || !/^https?:/.test(tab.state.url)) return;
-    const host = new URL(tab.state.url).hostname.toLowerCase();
-    const list = ctx.settings.get('dataSaverAllowlist') || [];
-    const allowed = list.includes(host);
-    if (!ctx.settings.set('dataSaverAllowlist', allowed ? list.filter(x => x !== host) : [...list, host])) return;
-    win.sendChrome('toast', { message: allowed ? 'Site exception removed. Reload to apply.' : 'Full content allowed on this site. Reload to apply.' });
-  } },
-
   // View
   { id: 'fullscreen', label: 'Full screen', section: 'View', keys: IS_MAC ? ['Cmd+Ctrl+F'] : ['F11'], run: ({ win }) => win?.toggleFullscreen() },
   {
