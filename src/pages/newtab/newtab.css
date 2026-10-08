@@ -650,3 +650,7 @@ body.private .lib-brand { display: none; }
 
 .liberia-flag { display: inline-block; width: 28px; height: 18px; position: relative; vertical-align: middle; margin-right: 5px; background: repeating-linear-gradient(to bottom, #bf0a30 0, #bf0a30 1.636px, #fff 1.636px, #fff 3.272px); border-radius: 2px; overflow: hidden; }
 .liberia-flag::before { content: '★'; position: absolute; left: 0; top: 0; width: 10px; height: 10px; background: #002868; color: white; font-style: normal; font-size: 9px; line-height: 10px; text-align: center; }
+
+.africa-message { font-size: 12px; text-align: center; color: var(--fg-2); margin: -12px 0 22px; max-width: 480px; line-height: 1.7; }
+body.private .africa-message { display: none; }
+body.bg-pan-africa #bg::after { border-top: 5px solid #bb303b; border-bottom: 5px solid #126d3e; }
