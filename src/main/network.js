@@ -3,6 +3,7 @@
 const { webContents } = require('electron');
 const { getDomain } = require('tldts');
 const ctx = require('./context');
+const dataSaver = require('./data-saver');
 const { isLocalHost } = require('./url-utils');
 
 /**
@@ -93,6 +94,10 @@ function setupNetwork(ses) {
         if (tab) tab.onRequestBlocked(url);
         return callback(result.cancel ? { cancel: true } : { redirectURL: result.redirectURL });
       }
+      if (dataSaver.shouldBlock(ctx.settings, details, pageUrl)) {
+        dataSaver.countBlocked(ses, details.resourceType);
+        return callback({ cancel: true });
+      }
       return callback({});
     } catch (err) {
       console.error('[network] onBeforeRequest', err);
@@ -104,6 +109,8 @@ function setupNetwork(ses) {
     try {
       const headers = details.requestHeaders;
       if (!/^https?:/i.test(details.url)) return callback({ requestHeaders: headers });
+      const saverPage = details.resourceType === 'mainFrame' ? details.url : pageUrlFor(details);
+      if (dataSaver.activeFor(ctx.settings, saverPage)) headers['Save-Data'] = 'on';
       if (ctx.settings.get('doNotTrack')) headers.DNT = '1';
       if (ctx.settings.get('globalPrivacyControl')) headers['Sec-GPC'] = '1';
       if (ctx.settings.get('blockThirdPartyCookies') && details.resourceType !== 'mainFrame') {

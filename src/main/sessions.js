@@ -64,6 +64,7 @@ async function resetPrivateSession() {
   } catch (err) {
     console.error('[sessions] failed to reset private session', err);
   }
+  require('./data-saver').resetStats(ses);
   ctx.downloads.clearPrivate();
 }
 
