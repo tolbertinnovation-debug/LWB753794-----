@@ -204,6 +204,7 @@ class Tab extends EventEmitter {
       this._typed = false;
       this._emitUpdate();
       this.win.onTabNavigated(this);
+      if (require('./signin-help').rejectedGoogleSignin(url)) this.win.sendChrome('toast', { message: 'Google rejected this sign-in. Open Google sign-in help in the browser menu.' });
     });
     wc.on('did-navigate-in-page', (_e, url, isMainFrame) => {
       if (!isMainFrame) return;

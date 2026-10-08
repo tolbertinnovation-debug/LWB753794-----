@@ -90,6 +90,7 @@ export function openAppMenu(anchor) {
     { label: 'Save page as…', iconHtml: icon('save', 17), shortcut: `${mod()}S`, onClick: () => run('savePage') },
     { label: 'Developer tools', iconHtml: icon('code', 17), shortcut: isMac() ? '⌥⌘I' : 'F12', onClick: () => run('devtools') },
     { label: 'View page source', iconHtml: icon('code', 17), disabled: !t || !/^(https?|file):/.test(t.url), onClick: () => run('viewSource') },
+    { label: 'Google sign-in help', iconHtml: icon('globe', 17), onClick: () => run('googleSigninHelp') },
     { label: 'Developer extensions…', iconHtml: icon('code', 17), onClick: () => run('extensions') },
     { label: 'Website inspection guide', iconHtml: icon('code', 17), onClick: () => run('developerGuide') },
     { label: 'Task manager', iconHtml: icon('activity', 17), shortcut: isMac() ? '' : 'Shift+Esc', onClick: () => run('taskManager') },

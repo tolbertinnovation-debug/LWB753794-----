@@ -257,6 +257,7 @@ const COMMANDS = [
       win.sendChrome('toast', { message: 'Link copied' });
     },
   },
+  { id: 'googleSigninHelp', label: 'Google sign-in help', section: 'Help', run: ({ win, tab }) => require('./signin-help').help(win, tab) },
   { id: 'extensions', label: 'Developer extensions…', section: 'Developer', run: ({ win }) => require('./developer-extensions').manage(win) },
   { id: 'developerGuide', label: 'Website inspection guide', section: 'Developer', run: ({ win }) => require('./developer-extensions').guide(win) },
   { id: 'viewSource', label: 'View page source', section: 'Developer', keys: IS_MAC ? ['Cmd+Alt+U'] : ['Ctrl+U'], pageFirst: true, run: ({ win, tab }) => tab && /^(https?|file):/.test(tab.state.url) && win.createTab({ url: `view-source:${tab.state.url}`, index: win.tabs.indexOf(tab) + 1 }) },
