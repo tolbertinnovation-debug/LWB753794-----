@@ -6,6 +6,8 @@ const { app, clipboard, dialog, shell, nativeTheme } = require('electron');
 const ctx = require('./context');
 const { NEWTAB_URL } = require('./tab');
 
+const { cleanLink, duplicateTabs } = require('./productivity');
+
 const IS_MAC = process.platform === 'darwin';
 
 function windows() {
@@ -89,6 +91,51 @@ async function savePage(win, tab) {
   }
 }
 
+
+async function savePdf(win, tab) {
+  const wc = tab?.webContents;
+  if (!win || !wc || !/^(https?|file):/.test(tab.state.url)) return;
+  const title = (tab.state.title || 'page').replace(/[\\/:*?"<>|]/g, '_').slice(0, 120);
+  const { canceled, filePath } = await dialog.showSaveDialog(win.win, {
+    title: 'Save page as PDF',
+    defaultPath: path.join(ctx.settings.get('downloadDir') || app.getPath('downloads'), `${title}.pdf`),
+    filters: [{ name: 'PDF document', extensions: ['pdf'] }],
+  });
+  if (canceled || !filePath) return;
+  try {
+    const pdf = await wc.printToPDF({ printBackground: true, preferCSSPageSize: true });
+    await fs.promises.writeFile(filePath, pdf);
+    win.sendChrome('toast', { message: 'PDF saved', action: { label: 'Show', command: 'showFile', arg: filePath } });
+  } catch {
+    win.sendChrome('toast', { message: 'Couldn’t save PDF', kind: 'error' });
+  }
+}
+
+async function closeDuplicates(win) {
+  if (!win) return;
+  const candidates = duplicateTabs(win.tabs, win.activeTab);
+  let closed = 0;
+  for (const tab of candidates) {
+    await win.closeTab(tab); // Keep each page's unsaved-work confirmation.
+    if (!win.tabs.includes(tab)) closed++;
+  }
+  win.sendChrome('toast', { message: closed ? `Closed ${closed} duplicate tab${closed === 1 ? '' : 's'} — Ctrl+Shift+T to restore` : 'No duplicate tabs closed' });
+}
+
+async function sleepBackgroundTabs(win) {
+  if (!win) return;
+  const { response } = await dialog.showMessageBox(win.win, {
+    type: 'question', title: 'Free browser memory',
+    message: 'Sleep background tabs?',
+    detail: 'Sleeping pages reload when you return. Save unfinished forms or edits first. Active, visible, pinned, loading, playing and developer-tool tabs stay awake.',
+    buttons: ['Cancel', 'Sleep tabs'], defaultId: 0, cancelId: 0,
+  });
+  if (response !== 1 || win.win.isDestroyed()) return;
+  let count = 0;
+  for (const tab of win.tabs) if (tab.discard()) count++;
+  win.sendChrome('toast', { message: `${count} background tab${count === 1 ? '' : 's'} put to sleep. Select a tab to wake it.` });
+}
+
 function reopenClosed(win) {
   const item = ctx.sessionState.popClosed();
   if (!item) return;
@@ -168,6 +215,15 @@ const COMMANDS = [
   { id: 'home', label: 'Home page', section: 'Navigation', keys: IS_MAC ? ['Cmd+Shift+H'] : ['Alt+Home'], run: ({ tab }) => tab?.navigate(ctx.settings.get('homepage') || NEWTAB_URL) },
   { id: 'focusOmnibox', label: 'Focus address bar', section: 'Navigation', keys: ['CmdOrCtrl+L', ...(IS_MAC ? [] : ['Alt+D']), 'F6'], palette: false, run: ({ win }) => win?.focusOmnibox({ select: true }) },
   { id: 'searchWeb', label: 'Search the web', section: 'Navigation', keys: ['CmdOrCtrl+K', 'CmdOrCtrl+E'], pageFirst: true, palette: false, run: ({ win }) => win?.focusOmnibox({ text: '?', select: false }) },
+
+  { id: 'closeDuplicateTabs', label: 'Close duplicate tabs', section: 'Tabs', run: ({ win }) => closeDuplicates(win) },
+  { id: 'sleepBackgroundTabs', label: 'Sleep background tabs to free memory', section: 'Tabs', run: ({ win }) => sleepBackgroundTabs(win) },
+  { id: 'savePdf', label: 'Save page as PDF…', section: 'Page', run: ({ win, tab }) => savePdf(win, tab) },
+  { id: 'copyCleanUrl', label: 'Copy link without tracking parameters', section: 'Privacy', run: ({ win, tab }) => {
+    if (!tab || !/^https?:/.test(tab.state.url)) return;
+    clipboard.writeText(cleanLink(tab.state.url));
+    win.sendChrome('toast', { message: 'Clean link copied' });
+  } },
 
   // Page
   { id: 'find', label: 'Find in page', section: 'Page', keys: ['CmdOrCtrl+F'], pageFirst: true, run: ({ win }) => openFind(win) },

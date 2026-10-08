@@ -58,6 +58,13 @@ After installing, open **Settings → General → Make default** to use LIB for 
 - **Permission prompts** for camera, microphone, location, notifications, screen sharing and more. Your choices are remembered per site and editable in the padlock panel.
 - A clean Chrome user agent (sites don't see "Electron"). Each tab runs sandboxed with context isolation, and internal pages are locked down with a strict CSP.
 
+**Productivity upgrade**
+- Save web pages directly as PDF from the browser menu or command palette.
+- Copy clean links without common campaign tracking parameters; navigation URLs stay unchanged.
+- Close exact duplicate tabs while keeping active, pinned, loading and playing tabs. Page close confirmations remain in place, and normal tabs can be reopened with Ctrl+Shift+T.
+- Free memory immediately by sleeping eligible background tabs; active, visible, pinned, loading, audio and developer-tool tabs are protected. Sleeping tabs reload when selected, so save unfinished work first.
+- Long sleeping-tab histories retain the correct current page and nearby back/forward entries.
+
 **Your stuff**
 - **Bookmarks** with folders, a bookmarks bar, and a full manager. Import/export works with Chrome, Edge, Firefox and Safari (HTML format).
 - **History** grouped by day, with search and bulk delete. **Clear browsing data** by time range.

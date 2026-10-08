@@ -9,6 +9,7 @@ const { injectionScript, isCertError } = require('./error-page');
 const { hostOf, originOf } = require('./url-utils');
 
 const PAGE_PRELOAD = path.join(__dirname, '..', 'preload', 'page-preload.js');
+const { boundedHistory } = require('./productivity');
 const NEWTAB_URL = 'lib://newtab/';
 const ZOOM_LEVELS = [0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5];
 
@@ -601,12 +602,9 @@ class Tab extends EventEmitter {
   /** Put the tab to sleep to free memory. */
   discard() {
     const wc = this.webContents;
-    if (!wc || this.isActive || this.state.audible || this.win.isTabVisible(this) || this.state.devtools) return false;
+    if (!wc || this.isActive || this.state.audible || this.state.pinned || this.state.loading || this.win.isTabVisible(this) || this.state.devtools) return false;
     try {
-      this.savedHistory = {
-        entries: wc.navigationHistory.getAllEntries().slice(-50),
-        index: Math.min(wc.navigationHistory.getActiveIndex(), 49),
-      };
+      this.savedHistory = boundedHistory(wc.navigationHistory.getAllEntries(), wc.navigationHistory.getActiveIndex());
     } catch {
       this.savedHistory = null;
     }
