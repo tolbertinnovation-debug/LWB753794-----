@@ -3,7 +3,7 @@ import { icon } from '/_shared/icons.js';
 import { call, lib, initPage, confirmDialog, formDialog, toast } from '/_shared/page.js';
 
 let tree;
-let current = 'bar';
+let current = new URLSearchParams(location.search).get('folder') || 'bar';
 const byId = new Map();
 const parentOf = new Map();
 

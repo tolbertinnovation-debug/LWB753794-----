@@ -10,6 +10,7 @@ const SECTIONS = [
   { id: 'appearance', label: 'Appearance', icon: 'palette' },
   { id: 'search', label: 'Search engine', icon: 'search' },
   { id: 'privacy', label: 'Privacy & security', icon: 'shield' },
+  { id: 'vpn', label: 'VPN setup', icon: 'shield' },
   { id: 'performance', label: 'Performance', icon: 'zap' },
   { id: 'downloads', label: 'Downloads', icon: 'download' },
   { id: 'languages', label: 'Languages', icon: 'translate' },
@@ -75,6 +76,18 @@ function section(id, title, desc, ...rows) {
 }
 
 // ------------------------------------------------------------------ sections
+
+function vpnSection() {
+  const proton = h('a.btn.primary', { href: 'https://protonvpn.com/free-vpn' }, 'Get Proton VPN');
+  const mullvad = h('a.btn', { href: 'https://mullvad.net/en/download/vpn' }, 'View Mullvad VPN');
+  return section('vpn', 'VPN setup', 'Use a trusted VPN app alongside LIB Browser. A VPN connection has not been configured inside LIB.',
+    row('Connection status: not verified', 'LIB does not monitor your VPN app. Check its connection indicator before browsing.'),
+    row('Proton VPN — free starting option', 'Install the official app for your computer, create an account and connect before opening websites.', proton),
+    row('Mullvad VPN — paid alternative', 'View current pricing and download the official app from the provider.', mullvad),
+    row('How to use a VPN with LIB', '1. Install your chosen VPN app. 2. Connect in that app. 3. Enable its kill switch if needed. 4. Browse with LIB. Manage server choice and connection status in the VPN app.'),
+    row('Built-in VPN integration', 'A built-in Connect button requires a supported provider API or a VPN server, credentials and a native networking component. This setup page does not create a tunnel.'),
+  );
+}
 
 function generalSection(defaultStatus) {
   const homepage = h('input.input', { type: 'text', value: S.homepage, spellcheck: 'false', style: { width: '280px' } });
@@ -448,7 +461,7 @@ async function main() {
   meta = data;
   const defaultStatus = await call('defaultBrowserStatus');
   const sections = $('#sections');
-  sections.append(generalSection(defaultStatus), appearanceSection(), searchSection(), await privacySection(), performanceSection(), downloadsSection(), languagesSection(), resetSection());
+  sections.append(generalSection(defaultStatus), appearanceSection(), searchSection(), await privacySection(), vpnSection(), performanceSection(), downloadsSection(), languagesSection(), resetSection());
   initNav();
   initFilter();
   if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();

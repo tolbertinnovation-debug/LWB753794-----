@@ -262,6 +262,29 @@ const COMMANDS = [
   { id: 'inspect', label: 'Inspect element', section: 'Developer', keys: [IS_MAC ? 'Cmd+Shift+C' : 'Ctrl+Shift+C'], palette: false, run: ({ tab }) => tab?.openDevTools() },
   { id: 'taskManager', label: 'Task manager', section: 'Developer', keys: IS_MAC ? [] : ['Shift+Escape'], run: ({ win }) => openInternal(win, 'tasks') },
 
+  { id: 'saveForLater', label: 'Save page to reading list', section: 'Bookmarks', run: ({ win, tab }) => {
+    if (!tab || !/^https?:/.test(tab.state.url)) return;
+    if (win.isPrivate) { win.sendChrome('toast', { message: 'Reading-list saving is disabled in private windows' }); return; }
+    ctx.bookmarks.saveForLater({ url: tab.state.url, title: tab.state.title });
+    win.sendChrome('toast', { message: 'Saved to reading list' });
+  } },
+  { id: 'readingList', label: 'Open reading list', section: 'Bookmarks', run: ({ win }) => {
+    const folder = ctx.bookmarks.readingListFolder();
+    const tab = openInternal(win, 'bookmarks');
+    tab?.navigate(`lib://bookmarks/?folder=${encodeURIComponent(folder.id)}`);
+  } },
+  { id: 'copyTabLinks', label: 'Copy all open web-page links', section: 'Tabs', run: ({ win }) => {
+    if (!win) return;
+    const urls = [...new Set(win.tabs.map(t => t.state.url).filter(url => /^https?:/.test(url)))];
+    if (!urls.length) { win.sendChrome('toast', { message: 'No web-page links to copy' }); return; }
+    clipboard.writeText(urls.join('\n'));
+    win.sendChrome('toast', { message: `Copied ${urls.length} unique link${urls.length === 1 ? '' : 's'}` });
+  } },
+  { id: 'vpnSetup', label: 'VPN setup guide', section: 'Privacy', run: ({ win }) => {
+    const tab = openInternal(win, 'settings');
+    tab?.navigate('lib://settings/#vpn');
+  } },
+
   // Library
   { id: 'bookmarkPage', label: 'Bookmark this page', section: 'Bookmarks', keys: ['CmdOrCtrl+D'], pageFirst: true, run: ({ win }) => win?.sendChrome('bookmark-edit', {}) },
   {
