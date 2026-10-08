@@ -635,3 +635,18 @@ body.private #bg {
     grid-template-columns: repeat(auto-fit, 88px);
   }
 }
+
+/* LIB Liberia edition */
+.lib-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.lib-brand img { width: 64px; height: 64px; filter: drop-shadow(0 8px 18px #0004); }
+.lib-brand strong { display: block; font-size: 24px; letter-spacing: -.04em; }
+.lib-brand span { display: block; font-size: 12px; opacity: .8; margin-top: 4px; }
+#hero { padding-top: clamp(24px, 7vh, 90px); }
+#footer .brand-credit { width: 100%; margin: 8px 0 0; color: var(--fg-2); order: 3; }
+body.bg-liberia #bg::after { border-top: 5px solid #bf0a30; }
+body.bg-liberia #search { border-radius: 18px; box-shadow: 0 12px 40px #0003; }
+body.private .lib-brand { display: none; }
+@media (max-height: 650px) { .lib-brand { margin-bottom: 14px; } .lib-brand img { width: 44px; height: 44px; } }
+
+.liberia-flag { display: inline-block; width: 28px; height: 18px; position: relative; vertical-align: middle; margin-right: 5px; background: repeating-linear-gradient(to bottom, #bf0a30 0, #bf0a30 1.636px, #fff 1.636px, #fff 3.272px); border-radius: 2px; overflow: hidden; }
+.liberia-flag::before { content: '★'; position: absolute; left: 0; top: 0; width: 10px; height: 10px; background: #002868; color: white; font-style: normal; font-size: 9px; line-height: 10px; text-align: center; }

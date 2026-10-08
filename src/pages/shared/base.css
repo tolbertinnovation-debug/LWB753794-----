@@ -1,7 +1,7 @@
 /* LIB Browser — design system for internal (lib://) pages */
 
 :root {
-  --accent: #6d5dfc;
+  --accent: #bf0a30;
   --accent-contrast: #fff;
   --font: system-ui, -apple-system, 'Segoe UI Variable Text', 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   --display: 'Segoe UI Variable Display', system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, sans-serif;
@@ -836,3 +836,11 @@ textarea.input {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Liberia identity: clear surfaces, red accents and navy depth. */
+:root { --radius: 18px; --bg: #f3f6fc; --bg-2: #eaf0f9; }
+.brand-credit { font-size: 12px; text-align: center; line-height: 1.6; }
+.brand-credit a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.card { overflow: hidden; }
+.sidebar { border-top: 4px solid #bf0a30; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

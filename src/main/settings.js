@@ -3,7 +3,7 @@
 const { EventEmitter } = require('node:events');
 const { JsonStore } = require('./store');
 
-const ACCENTS = ['#6d5dfc', '#0a84ff', '#12b886', '#f59f00', '#f03e3e', '#e64980', '#7950f2', '#15aabf'];
+const ACCENTS = ['#bf0a30', '#002868', '#6d5dfc', '#0a84ff', '#12b886', '#f59f00', '#f03e3e', '#e64980', '#7950f2', '#15aabf'];
 
 function defaults(downloadsPath) {
   return {
@@ -46,7 +46,7 @@ function defaults(downloadsPath) {
     ntpShowTopSites: true,
     ntpShowStats: true,
     ntpShowGreeting: true,
-    ntpBackground: 'aurora', // preset id or 'custom'
+    ntpBackground: 'liberia', // preset id or 'custom'
     ntpCustomBackground: '',
     ntpName: '',
     ntpQuickLinks: [],

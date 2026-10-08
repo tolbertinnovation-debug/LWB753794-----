@@ -81,14 +81,11 @@ export function icon(name, size = 18, cls = '') {
   return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 }
 
-let logoSeq = 0;
+
 
 /** The LIB brand mark (used for internal pages). */
 export function logo(size = 18) {
-  // Unique gradient id: a shared id would resolve to the first copy in the
-  // document, which may be inside a hidden element (no gradient rendered).
-  const id = `lib-logo-${++logoSeq}`;
-  return `<svg class="lib-logo" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#${id})"/><path d="M24 17v30h19" fill="none" stroke="#fff" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="43.5" cy="21.5" r="5.2" fill="#fff"/></svg>`;
+  return `<img class="lib-logo" src="lib://newtab/_shared/lib-icon.png" width="${size}" height="${size}" alt="" />`;
 }
 
 export const ICON_NAMES = Object.keys(P);
