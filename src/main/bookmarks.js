@@ -43,6 +43,7 @@ class Bookmarks extends EventEmitter {
       migrate: (d) => ({
         bar: d?.bar?.children ? d.bar : makeRoot('bar'),
         other: d?.other?.children ? d.other : makeRoot('other'),
+        readingListId: typeof d?.readingListId === 'string' ? d.readingListId : null,
       }),
     });
     this._index();
@@ -75,6 +76,23 @@ class Bookmarks extends EventEmitter {
 
   tree() {
     return { bar: this.store.data.bar, other: this.store.data.other };
+  }
+
+  readingListFolder() {
+    let folder = this.get(this.store.data.readingListId);
+    if (!folder || folder.type !== 'folder') {
+      folder = this.add({ parentId: 'other', type: 'folder', title: 'Reading list' });
+      this.store.data.readingListId = folder.id;
+      this.store.save();
+    }
+    return folder;
+  }
+
+  saveForLater({ url, title }) {
+    if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) throw new Error('Only web pages can be saved');
+    const folder = this.readingListFolder();
+    const existing = folder.children.find((item) => item.type === 'bookmark' && item.url === url);
+    return existing || this.add({ parentId: folder.id, url, title });
   }
 
   barItems() {
