@@ -489,7 +489,7 @@ function buildApplicationMenu() {
         sep,
         {
           label: 'Developer',
-          submenu: [...cmd('viewSource'), ...cmd('devtools'), ...cmd('inspect'), ...cmd('taskManager')],
+          submenu: [...cmd('viewSource'), ...cmd('devtools'), ...cmd('inspect'), ...cmd('extensions'), ...cmd('developerGuide'), ...cmd('taskManager')],
         },
       ],
     },
