@@ -257,6 +257,8 @@ const COMMANDS = [
       win.sendChrome('toast', { message: 'Link copied' });
     },
   },
+  { id: 'extensions', label: 'Developer extensions…', section: 'Developer', run: ({ win }) => require('./developer-extensions').manage(win) },
+  { id: 'developerGuide', label: 'Website inspection guide', section: 'Developer', run: ({ win }) => require('./developer-extensions').guide(win) },
   { id: 'viewSource', label: 'View page source', section: 'Developer', keys: IS_MAC ? ['Cmd+Alt+U'] : ['Ctrl+U'], pageFirst: true, run: ({ win, tab }) => tab && /^(https?|file):/.test(tab.state.url) && win.createTab({ url: `view-source:${tab.state.url}`, index: win.tabs.indexOf(tab) + 1 }) },
   { id: 'devtools', label: 'Developer tools', section: 'Developer', keys: ['F12', ...(IS_MAC ? ['Cmd+Alt+I'] : ['Ctrl+Shift+I', 'Ctrl+Shift+J'])], run: ({ tab }) => tab?.toggleDevTools() },
   { id: 'inspect', label: 'Inspect element', section: 'Developer', keys: [IS_MAC ? 'Cmd+Shift+C' : 'Ctrl+Shift+C'], palette: false, run: ({ tab }) => tab?.openDevTools() },

@@ -640,7 +640,7 @@ class Tab extends EventEmitter {
     if (!wc || this.state.devtools) return;
     // Docked DevTools: render the inspector in our own view next to the page.
     if (!this.win.split) {
-      this.devtoolsView = new WebContentsView();
+      this.devtoolsView = new WebContentsView({ webPreferences: { session: wc.session, nodeIntegration: false, contextIsolation: true, sandbox: true } });
       this.devtoolsView.setBackgroundColor('#ffffff');
       wc.setDevToolsWebContents(this.devtoolsView.webContents);
       wc.openDevTools({ mode: 'detach', activate: true });
