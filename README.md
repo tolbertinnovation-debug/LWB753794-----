@@ -162,6 +162,14 @@ Security model:
 - Web pages can't navigate to `lib://` pages or embed them.
 - Keyboard-shortcut messages from pages are only honored right after a matching real key press.
 
+## Security hardening
+
+New profiles enable HTTPS-Only and third-party cookie blocking and disable remote search suggestions. Existing users can apply **Settings → Privacy & security → Enable strong protection**; this also clears ad-block and HTTP site exceptions. Some embeds and sign-ins may need adjustment.
+
+Sensitive permissions require HTTPS or local loopback origins and explicit consent. Private windows do not inherit saved permission grants. Device/file access and keyboard capture are no longer automatically approved. Screen sharing does not automatically add system audio. External application links use a restricted protocol list and default to Cancel. Certificate errors never trigger silent HTTP fallback. Browser IPC rejects inherited method names, embedded-frame callers and unknown internal-page hosts.
+
+These controls do not guarantee protection from all threats. Keep the browser updated; the installers are not yet signed with a commercial signing certificate and no independent penetration test has been completed.
+
 ## Privacy
 
 LIB has no accounts, no telemetry and no crash uploads. Your history, bookmarks and settings stay in your profile folder (shown on the **About** page). The network requests LIB makes on its own are:

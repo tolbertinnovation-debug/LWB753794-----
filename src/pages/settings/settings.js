@@ -201,6 +201,15 @@ function searchSection() {
 }
 
 async function privacySection() {
+  const strong = h('button.btn.primary', {}, 'Enable strong protection');
+  strong.addEventListener('click', async () => {
+    strong.disabled = true;
+    try {
+      for (const [key, value] of Object.entries({ adblockEnabled: true, httpsOnly: true, blockThirdPartyCookies: true, doNotTrack: true, globalPrivacyControl: true, searchSuggestions: false, httpsExceptions: [], adblockAllowlist: [] })) await set(key, value);
+      toast('Strong protection enabled');
+      location.reload();
+    } finally { strong.disabled = false; }
+  });
   const info = await call('adblockInfo');
   const perms = await call('sitePermissions');
   const statsGrid = h(
@@ -282,6 +291,7 @@ async function privacySection() {
     row('Filter lists', 'Updated automatically every few days.', update, { sub: true, keywords: 'adblock update' }),
     row('Sites where ads are allowed', null, allowChips, { sub: true, keywords: 'allowlist whitelist adblock' }),
     row('HTTPS-Only mode', 'Always use secure connections; warn before loading insecure sites.', toggle('httpsOnly'), { keywords: 'https secure ssl' }),
+    row('Strong protection preset', 'Enable HTTPS-Only, tracker blocking and third-party cookie blocking; turn off remote search suggestions and clear site exceptions. Some sign-ins and embedded content may need adjustment.', strong),
     row('HTTPS-Only exceptions', null, httpsChips, { sub: true, keywords: 'https' }),
     row('Send “Do Not Track”', 'Ask websites not to track you.', toggle('doNotTrack'), { keywords: 'dnt' }),
     row('Global Privacy Control', 'Tell websites not to sell or share your data (legally binding in some places).', toggle('globalPrivacyControl'), { keywords: 'gpc sell' }),

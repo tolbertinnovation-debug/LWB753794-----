@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { ipcMain, app, dialog, shell, clipboard, nativeTheme, webContents: WebContents } = require('electron');
 const ctx = require('./context');
+const { apiMethod, trustedInternalFrame } = require('./security-policy');
 const windows = require('./windows');
 const commands = require('./commands');
 const menus = require('./menus');
@@ -312,7 +313,8 @@ const chromeApi = {
   },
 
   // Prompts
-  permissionRespond(_win, id, allow, remember) {
+  permissionRespond(win, id, allow, remember) {
+    if (ctx.permissions.pending.get(id)?.tab.win !== win) return;
     ctx.permissions.respond(id, Boolean(allow), remember !== false);
   },
   authRespond(win, id, creds) {
@@ -756,15 +758,15 @@ const pageApi = {
 function register() {
   ipcMain.handle('lib:chrome', async (event, method, ...args) => {
     const win = windows.findWindowByChromeWebContents(event.sender);
-    if (!win) throw new Error('Unknown window');
-    const fn = chromeApi[method];
+    if (!win || !event.senderFrame || event.senderFrame.parent) throw new Error('Unknown window');
+    const fn = apiMethod(chromeApi, method);
     if (typeof fn !== 'function') throw new Error(`Unknown method ${method}`);
     return fn(win, ...args);
   });
   ipcMain.on('lib:chrome-send', (event, method, ...args) => {
     const win = windows.findWindowByChromeWebContents(event.sender);
-    const fn = chromeApi[method];
-    if (win && typeof fn === 'function') {
+    const fn = apiMethod(chromeApi, method);
+    if (win && event.senderFrame && !event.senderFrame.parent && typeof fn === 'function') {
       try {
         const r = fn(win, ...args);
         if (r && typeof r.catch === 'function') r.catch(() => {});
@@ -777,10 +779,10 @@ function register() {
   ipcMain.handle('lib:page', async (event, method, ...args) => {
     const frame = event.senderFrame;
     // Only top-level lib:// documents get the privileged API.
-    if (!frame || frame.parent || !String(frame.url).startsWith('lib://')) throw new Error('Forbidden');
+    if (!trustedInternalFrame(frame)) throw new Error('Forbidden');
     const tab = windows.findTabByWebContents(event.sender);
     if (!tab) throw new Error('Unknown tab');
-    const fn = pageApi[method];
+    const fn = apiMethod(pageApi, method);
     if (typeof fn !== 'function') throw new Error(`Unknown method ${method}`);
     return fn(tab, ...args);
   });
