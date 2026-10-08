@@ -725,6 +725,8 @@ const pageApi = {
     return true;
   },
 
+  dataSaverStats(tab) { return require('./data-saver').sessionStats(tab.win.session); },
+
   // Task manager
   taskList() {
     return taskList();

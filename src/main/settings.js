@@ -33,6 +33,8 @@ function defaults(downloadsPath) {
     globalPrivacyControl: true,
     blockThirdPartyCookies: true,
     clearOnExit: false,
+    dataSaverMode: 'off',
+    dataSaverAllowlist: [],
     // Performance
     tabSleepEnabled: true,
     tabSleepMinutes: 30,
@@ -58,6 +60,8 @@ function defaults(downloadsPath) {
 
 /** Validators keep bad values (from sync files or buggy pages) out of the store. */
 const VALIDATORS = {
+  dataSaverMode: v => ['off', 'balanced', 'maximum'].includes(v),
+  dataSaverAllowlist: v => Array.isArray(v) && v.length <= 200 && v.every(host => typeof host === 'string' && /^[a-z0-9.-]+$/i.test(host) && host.length <= 253),
   startup: (v) => ['restore', 'newtab', 'homepage'].includes(v),
   homepage: (v) => typeof v === 'string' && v.length < 4096,
   theme: (v) => ['system', 'light', 'dark'].includes(v),

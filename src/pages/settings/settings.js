@@ -11,6 +11,7 @@ const SECTIONS = [
   { id: 'search', label: 'Search engine', icon: 'search' },
   { id: 'privacy', label: 'Privacy & security', icon: 'shield' },
   { id: 'vpn', label: 'VPN setup', icon: 'shield' },
+  { id: 'data-saver', label: 'Data Saver', icon: 'zap' },
   { id: 'performance', label: 'Performance', icon: 'zap' },
   { id: 'downloads', label: 'Downloads', icon: 'download' },
   { id: 'languages', label: 'Languages', icon: 'translate' },
@@ -303,6 +304,31 @@ async function privacySection() {
   );
 }
 
+async function dataSaverSection() {
+  const counts = await call('dataSaverStats');
+  const exceptions = h('div.chips');
+  const render = () => {
+    exceptions.replaceChildren();
+    for (const host of S.dataSaverAllowlist || []) {
+      const remove = h('button', { title: `Remove ${host}` }, '×');
+      remove.addEventListener('click', async () => { await set('dataSaverAllowlist', S.dataSaverAllowlist.filter(x => x !== host)); render(); });
+      exceptions.append(h('span.chip', {}, host, remove));
+    }
+    if (!exceptions.childNodes.length) exceptions.append('No site exceptions.');
+  };
+  render();
+  const refresh = h('button.btn', {}, 'Refresh counts');
+  const summary = h('span', {}, `${counts.total} heavy requests blocked (${counts.media} media, ${counts.image} images, ${counts.font} fonts)`);
+  refresh.addEventListener('click', async () => { const c = await call('dataSaverStats'); summary.textContent = `${c.total} heavy requests blocked (${c.media} media, ${c.image} images, ${c.font} fonts)`; });
+  return section('data-saver', 'Data Saver', 'Use less data on limited bundles and slower connections. Reload pages after changing modes or exceptions.',
+    row('Saving level', 'Balanced blocks audio/video requests. Maximum also blocks images and web fonts. Scripts, styles, sign-in requests and page downloads remain available.', select('dataSaverMode', [['off', 'Off'], ['balanced', 'Balanced'], ['maximum', 'Maximum']])),
+    row('Ask websites for lighter pages', 'Enabled automatically with either saving mode using the Save-Data request header. Websites decide whether to honor it.'),
+    row('Blocked requests this browser session', 'Counts apply to this normal or private browsing session only. These are requests, not measured bytes or MB saved.', h('div', {}, summary, refresh)),
+    row('Sites allowed to load full content', 'Use “Allow full content on this site” in the browser menu. Exceptions match the exact hostname and are saved in your profile.', exceptions),
+    row('Video lessons and calls', 'Saving modes can block lessons, music and streamed video; Maximum can also hide image-based controls. Allow full content for those sites. Media delivered through other request types may still load.'),
+  );
+}
+
 function performanceSection() {
   return section(
     'performance',
@@ -471,7 +497,7 @@ async function main() {
   meta = data;
   const defaultStatus = await call('defaultBrowserStatus');
   const sections = $('#sections');
-  sections.append(generalSection(defaultStatus), appearanceSection(), searchSection(), await privacySection(), vpnSection(), performanceSection(), downloadsSection(), languagesSection(), resetSection());
+  sections.append(generalSection(defaultStatus), appearanceSection(), searchSection(), await privacySection(), vpnSection(), await dataSaverSection(), performanceSection(), downloadsSection(), languagesSection(), resetSection());
   initNav();
   initFilter();
   if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
