@@ -3,6 +3,7 @@ import { icon } from '/_shared/icons.js';
 import { call, lib, initPage, formDialog, toast, applyTheme } from '/_shared/page.js';
 
 const BACKGROUNDS = [
+  { id: 'liberia', name: 'Liberia', css: 'radial-gradient(ellipse at 85% 90%, #bf0a3060, transparent 55%), radial-gradient(ellipse at 10% 0%, #164b92, transparent 60%), linear-gradient(145deg, #002868, #07162f)' },
   { id: 'aurora', name: 'Aurora', css: 'radial-gradient(1200px 800px at 15% 0%, #1b1446 0%, transparent 60%), linear-gradient(160deg, #0d0f24 0%, #12132b 50%, #0a1a2a 100%)' },
   { id: 'sunset', name: 'Sunset', css: 'linear-gradient(140deg, #ff9966 0%, #ff5e62 38%, #8e2de2 100%)' },
   { id: 'ocean', name: 'Ocean', css: 'linear-gradient(150deg, #0f2027 0%, #203a43 45%, #2c7a8c 100%)' },
@@ -363,7 +364,7 @@ function openDrawer() {
   more.addEventListener('click', () => call('openUrl', 'lib://settings/', 'current'));
   const reset = h('button.btn.ghost', {}, 'Reset page');
   reset.addEventListener('click', async () => {
-    for (const [k, v] of Object.entries({ ntpBackground: 'aurora', ntpShowClock: true, ntpShowTopSites: true, ntpShowStats: true, ntpShowGreeting: true, ntpHiddenSites: [] })) await call('setSetting', k, v);
+    for (const [k, v] of Object.entries({ ntpBackground: 'liberia', ntpShowClock: true, ntpShowTopSites: true, ntpShowStats: true, ntpShowGreeting: true, ntpHiddenSites: [] })) await call('setSetting', k, v);
   });
   drawer.append(
     h('div.drawer-head', {}, h('h2', {}, 'Customize'), close),

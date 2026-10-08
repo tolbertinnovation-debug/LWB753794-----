@@ -2,7 +2,7 @@ import { h, $ } from '/_shared/dom.js';
 import { icon } from '/_shared/icons.js';
 import { call, initPage, toast, applyAccent } from '/_shared/page.js';
 
-const LOGO = '<svg class="logo" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6366f1"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#g)"/><path d="M24 17v30h19" fill="none" stroke="#fff" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="43.5" cy="21.5" r="5.2" fill="#fff"/></svg>';
+const LOGO = '<img class="logo" src="/_shared/lib-icon.png" alt="LIB Browser icon" />';
 
 let S;
 let meta;
@@ -33,7 +33,7 @@ const STEPS = [
       {},
       h('div', { html: LOGO }),
       h('h1', {}, 'Welcome to LIB Browser'),
-      h('p.lead', {}, 'A fast, private and beautiful way to explore the web. Ads and trackers are blocked from the start — let’s make it yours in a few quick steps.'),
+      h('p.lead', {}, 'From Liberia to the world — a fast, private and beautiful way to explore the web. Ads and trackers are blocked from the start — let’s make it yours in a few quick steps.'),
     ),
   () => {
     const wrap = h('div.step', {}, h('h1', {}, 'Choose your look'), h('p.lead', {}, 'You can change this anytime in Settings.'));
