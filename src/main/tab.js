@@ -9,6 +9,7 @@ const { injectionScript, isCertError } = require('./error-page');
 const { hostOf, originOf } = require('./url-utils');
 
 const PAGE_PRELOAD = path.join(__dirname, '..', 'preload', 'page-preload.js');
+const { safeExternalLink } = require('./security-policy');
 const { boundedHistory } = require('./productivity');
 const NEWTAB_URL = 'lib://newtab/';
 const ZOOM_LEVELS = [0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5];
@@ -112,12 +113,16 @@ class Tab extends EventEmitter {
       sandbox: true,
       nodeIntegration: false,
       webSecurity: true,
+      allowRunningInsecureContent: false,
+      nodeIntegrationInWorker: false,
+      nodeIntegrationInSubFrames: false,
+      webviewTag: false,
       spellcheck: Boolean(ctx.settings.get('spellcheck')),
       plugins: true, // built-in PDF viewer
       navigateOnDragDrop: true,
       scrollBounce: true,
       safeDialogs: true,
-      autoplayPolicy: 'no-user-gesture-required',
+      autoplayPolicy: 'user-gesture-required',
     };
   }
 
@@ -354,6 +359,7 @@ class Tab extends EventEmitter {
   }
 
   async _openExternal(url) {
+    if (!safeExternalLink(url)) { this.win.sendChrome('toast', { message: 'Blocked unsupported external application link' }); return; }
     let scheme = '';
     try {
       scheme = new URL(url).protocol.replace(':', '');
@@ -363,7 +369,7 @@ class Tab extends EventEmitter {
     const { response } = await dialog.showMessageBox(this.win.win, {
       type: 'question',
       buttons: ['Open', 'Cancel'],
-      defaultId: 0,
+      defaultId: 1,
       cancelId: 1,
       title: 'Open external application?',
       message: `Open ${scheme}: link?`,
@@ -423,7 +429,7 @@ class Tab extends EventEmitter {
 
   _onLoadError(code, description, url) {
     // Scheme-less input we auto-upgraded to https:// → retry over http://.
-    if (this._fallbackUrl && (HTTPS_FALLBACK_ERRORS.has(code) || isCertError(code))) {
+    if (this._fallbackUrl && !ctx.settings.get('httpsOnly') && HTTPS_FALLBACK_ERRORS.has(code) && !isCertError(code)) {
       const fallback = this._fallbackUrl;
       this._fallbackUrl = null;
       this.webContents?.loadURL(fallback).catch(() => {});

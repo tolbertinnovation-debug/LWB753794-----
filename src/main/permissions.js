@@ -2,6 +2,7 @@
 
 const { desktopCapturer, Menu } = require('electron');
 const ctx = require('./context');
+const { securePermissionOrigin } = require('./security-policy');
 const { originOf } = require('./url-utils');
 
 /** Harmless capabilities granted without asking (same as Chrome). */
@@ -9,17 +10,17 @@ const AUTO_ALLOW = new Set([
   'fullscreen',
   'clipboard-sanitized-write',
   'pointerLock',
-  'keyboardLock',
-  'persistent-storage',
-  'background-sync',
-  'speaker-selection',
   'mediaKeySystem',
   'screen-wake-lock',
-  'fileSystem',
 ]);
 
 /** Capabilities that require the user's consent, with human-readable text. */
 const PROMPTABLE = {
+  fileSystem: 'Access files selected on this device',
+  'speaker-selection': 'Choose an audio output device',
+  keyboardLock: 'Capture keyboard shortcuts',
+  'persistent-storage': 'Keep persistent website storage',
+  'background-sync': 'Sync data in the background',
   camera: 'Use your camera',
   microphone: 'Use your microphone',
   geolocation: 'Know your location',
@@ -72,9 +73,10 @@ class PermissionManager {
       if (AUTO_ALLOW.has(permission)) return true;
       const origin = requestingOrigin || details?.requestingUrl || (wc && wc.getURL());
       if (/^lib:/.test(origin || '')) return permission === 'clipboard-read';
-      const keys = permission === 'media' ? ['camera', 'microphone'] : [permission];
+      if (!securePermissionOrigin(origin) || isPrivate) return false;
+      const keys = keysFor(permission, details?.mediaType ? { mediaTypes: [details.mediaType] } : details);
       const o = originOf(origin);
-      return keys.some((k) => ctx.sitePrefs.getPermission(o, k) === 'allow');
+      return keys.every((k) => Object.hasOwn(PROMPTABLE, k) && ctx.sitePrefs.getPermission(o, k) === 'allow');
     });
     ses.setDisplayMediaRequestHandler(
       (request, callback) => this._onDisplayMedia(request, callback),
@@ -84,13 +86,14 @@ class PermissionManager {
 
   _onRequest(wc, permission, callback, details, isPrivate) {
     if (AUTO_ALLOW.has(permission)) return callback(true);
-    const url = details?.requestingUrl || wc.getURL();
+    const url = details?.requestingUrl || wc?.getURL() || '';
     const origin = originOf(url);
     if (/^lib:/.test(url)) return callback(permission === 'clipboard-read' || permission === 'notifications');
+    if (!securePermissionOrigin(url)) return callback(false);
     const keys = keysFor(permission, details);
-    if (!keys.every((k) => k in PROMPTABLE)) return callback(false);
+    if (!keys.every((k) => Object.hasOwn(PROMPTABLE, k))) return callback(false);
 
-    const decisions = keys.map((k) => ctx.sitePrefs.getPermission(origin, k));
+    const decisions = keys.map((k) => isPrivate ? undefined : ctx.sitePrefs.getPermission(origin, k));
     if (decisions.every((d) => d === 'allow')) return callback(true);
     if (decisions.some((d) => d === 'block')) return callback(false);
 
@@ -117,6 +120,7 @@ class PermissionManager {
         }
       })(),
       items: keys.map((k) => ({ key: k, label: PROMPTABLE[k] })),
+      noRemember: isPrivate,
     });
   }
 
@@ -163,6 +167,7 @@ class PermissionManager {
     const wc = request.frame?.top ? require('electron').webContents.fromFrame(request.frame) : null;
     const tab = wc ? findTab(wc) : null;
     const origin = originOf(request.securityOrigin || request.frame?.url || '');
+    if (!securePermissionOrigin(origin)) return callback({});
     // Screen sharing always asks (never remembered), like Chrome.
     const allowed = await new Promise((resolve) => {
       if (!tab) return resolve(false);
@@ -190,7 +195,7 @@ class PermissionManager {
           label: s.id.startsWith('screen') ? `Entire screen — ${s.name}` : `Window — ${s.name}`,
           click: () => {
             chosen = true;
-            callback(process.platform === 'win32' ? { video: s, audio: 'loopback' } : { video: s });
+            callback({ video: s });
           },
         })),
       ]);

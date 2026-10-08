@@ -23,15 +23,15 @@ function defaults(downloadsPath) {
     // Search
     searchEngine: 'google',
     customSearchUrl: '',
-    searchSuggestions: true,
+    searchSuggestions: false,
     // Privacy & security
     adblockEnabled: true,
     adblockAllowlist: [],
-    httpsOnly: false,
+    httpsOnly: true,
     httpsExceptions: [],
     doNotTrack: true,
     globalPrivacyControl: true,
-    blockThirdPartyCookies: false,
+    blockThirdPartyCookies: true,
     clearOnExit: false,
     // Performance
     tabSleepEnabled: true,
@@ -106,7 +106,7 @@ class Settings extends EventEmitter {
    * @returns {boolean} whether the value was stored
    */
   set(key, value) {
-    if (!(key in this._defaults)) return false;
+    if (typeof key !== 'string' || !Object.hasOwn(this._defaults, key)) return false;
     const def = this._defaults[key];
     const validate = VALIDATORS[key] || ((v) => typeof v === typeof def);
     if (!validate(value)) return false;
