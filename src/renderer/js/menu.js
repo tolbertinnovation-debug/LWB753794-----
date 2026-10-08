@@ -70,6 +70,7 @@ export function openAppMenu(anchor) {
     },
     { label: 'Downloads', iconHtml: icon('download', 17), shortcut: isMac() ? '⌘⇧J' : 'Ctrl+J', onClick: () => run('downloads') },
     { label: 'Save to reading list', iconHtml: icon('reader', 17), disabled: !t || !/^https?:/.test(t.url) || state.isPrivate, onClick: () => run('saveForLater') },
+    { label: 'Saved workspaces', iconHtml: icon('layers', 17), disabled: state.isPrivate, onClick: () => run('workspaces') },
     { label: 'Reading list', iconHtml: icon('reader', 17), onClick: () => run('readingList') },
     { label: 'Copy all tab links', iconHtml: icon('copy', 17), onClick: () => run('copyTabLinks') },
     { label: 'Bookmarks', iconHtml: icon('star', 17), shortcut: `${mod()}${shift()}O`, onClick: () => run('bookmarksManager') },

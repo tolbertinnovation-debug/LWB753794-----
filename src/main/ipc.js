@@ -707,6 +707,22 @@ const pageApi = {
     return commands.allShortcuts();
   },
 
+  workspaceList(tab) { return tab.isPrivate ? [] : ctx.workspaces.list(); },
+  workspaceSave(tab, name) {
+    if (tab.isPrivate) throw Error('Workspaces are unavailable in private windows');
+    return ctx.workspaces.save(name, tab.win.tabs.map(t => ({ url: t.state.url, title: t.state.title, pinned: t.state.pinned })));
+  },
+  workspaceRename(tab, id, name) { return !tab.isPrivate && ctx.workspaces.rename(String(id), name); },
+  workspaceRemove(tab, id) { return !tab.isPrivate && ctx.workspaces.remove(String(id)); },
+  workspaceOpen(tab, id) {
+    if (tab.isPrivate) return false;
+    const item = ctx.workspaces.get(String(id));
+    if (!item || !item.tabs.length) return false;
+    const w = windows.createWindow({ empty: true });
+    item.tabs.forEach((t, i) => w.createTab({ url: t.url, title: t.title, pinned: t.pinned, background: i > 0, lazy: i > 0 }));
+    return true;
+  },
+
   // Task manager
   taskList() {
     return taskList();

@@ -1,0 +1,6 @@
+#items { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,320px),1fr)); gap: 16px; margin-top: 24px; }
+#items .card { margin: 0; padding: 22px; }
+.workspace-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; }
+.workspace-tabs { padding-left:20px; color:var(--text-2); max-height:160px; overflow:auto; overflow-wrap:anywhere; }
+#items h2 { margin:0 0 8px; overflow-wrap:anywhere; }
+.search-box { margin-top:20px; }
