@@ -33,7 +33,7 @@ const STEPS = [
       {},
       h('div', { html: LOGO }),
       h('h1', {}, 'Welcome to LIB Browser'),
-      h('p.lead', {}, 'From Liberia to the world — a fast, private and beautiful way to explore the web. Ads and trackers are blocked from the start — let’s make it yours in a few quick steps.'),
+      h('p.lead', {}, 'Built in Liberia. Made for Africa. Open to the world — a browser for learners, creators and communities. Ads and trackers are blocked from the start — let’s make it yours in a few quick steps.'),
     ),
   () => {
     const wrap = h('div.step', {}, h('h1', {}, 'Choose your look'), h('p.lead', {}, 'You can change this anytime in Settings.'));

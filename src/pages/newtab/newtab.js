@@ -3,6 +3,7 @@ import { icon } from '/_shared/icons.js';
 import { call, lib, initPage, formDialog, toast, applyTheme } from '/_shared/page.js';
 
 const BACKGROUNDS = [
+  { id: 'pan-africa', name: 'Pan-African', css: 'repeating-linear-gradient(135deg, transparent 0 38px, #ffffff04 38px 40px), radial-gradient(ellipse at 90% 100%, #bb303b55, transparent 60%), linear-gradient(150deg, #164632, #0b1911)' },
   { id: 'liberia', name: 'Liberia', css: 'radial-gradient(ellipse at 85% 90%, #bf0a3060, transparent 55%), radial-gradient(ellipse at 10% 0%, #164b92, transparent 60%), linear-gradient(145deg, #002868, #07162f)' },
   { id: 'aurora', name: 'Aurora', css: 'radial-gradient(1200px 800px at 15% 0%, #1b1446 0%, transparent 60%), linear-gradient(160deg, #0d0f24 0%, #12132b 50%, #0a1a2a 100%)' },
   { id: 'sunset', name: 'Sunset', css: 'linear-gradient(140deg, #ff9966 0%, #ff5e62 38%, #8e2de2 100%)' },
